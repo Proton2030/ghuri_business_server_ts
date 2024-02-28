@@ -4,12 +4,13 @@ import { NODE_ENV } from "./config";
 console.log("NODE_ENV", String(NODE_ENV));
 
 const mongoURI: string =
+
 	String(NODE_ENV) == "PROD"
-		? "mongodb+srv://drprotonofficial:Adarsha%40123@cluster0.9ogg6pi.mongodb.net/"
+		? "mongodb://127.0.0.1:27082/PROD"
 		: String(NODE_ENV) == "DEV"
-		? "mongodb+srv://drprotonofficial:Adarsha%40123@cluster0.9ogg6pi.mongodb.net/"
+		? "mongodb://127.0.0.1:27082/DEV"
 		: String(NODE_ENV) == "LOCAL"
-		? "mongodb+srv://drprotonofficial:Adarsha%40123@cluster0.9ogg6pi.mongodb.net/"
+		? "mongodb://localhost:27017/ghuri"
 		: "";
 
 console.log("First Connection", mongoURI);
