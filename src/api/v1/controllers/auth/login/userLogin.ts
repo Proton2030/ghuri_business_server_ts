@@ -4,7 +4,7 @@ import { MESSAGE } from "../../../../../constants/message";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
-    const { full_name, email } = req.body;
+    const { full_name, email,photo_url } = req.body;
     const existingUser = await UserModel.findOne({ email: email });
 
     if (existingUser) {
@@ -17,7 +17,7 @@ export const userLogin = async (req: Request, res: Response) => {
     const newUser = new UserModel({
       full_name: full_name,
       email: email,
-      is_Premium: false
+      photo_url:photo_url
     });
 
     const reseponse = await newUser.save();
