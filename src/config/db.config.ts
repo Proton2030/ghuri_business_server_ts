@@ -10,7 +10,7 @@ const mongoURI: string =
 		: String(NODE_ENV) == "DEV"
 		? "mongodb://127.0.0.1:27082/DEV"
 		: String(NODE_ENV) == "LOCAL"
-		? "mongodb://localhost:27017/ghuri"
+		? "mongodb+srv://adarshahalder02:adarsha123@cluster0.xsarf3h.mongodb.net/ghuri"
 		: "";
 
 console.log("First Connection", mongoURI);
