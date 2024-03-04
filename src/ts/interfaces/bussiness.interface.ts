@@ -1,14 +1,14 @@
 import { IObjectId } from "./objectId.interface";
 
 export interface IBussinessSchema {
-name: string;
-phone_no: string;
-email:string;
-location:string;
-description:string,
-vacancy:string,
-
-
+    user_object_id:string;
+    name: string;
+    phone_no: string;
+    email:string;
+    location:string;
+    description:string,
+    photo:string[],
+    status:string
 }
 
 export interface IBussiness extends IBussinessSchema, IObjectId {}
