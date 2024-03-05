@@ -12,7 +12,7 @@ const BussinessSchema: Schema<IBussinessSchema> = new Schema<IBussinessSchema>(
 		description: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		location: SCHEMA_DEFINITION_PROPERTY.requiredString,
 		email:SCHEMA_DEFINITION_PROPERTY.optionalNullString,
-		photo:SCHEMA_DEFINITION_PROPERTY.optionalNullObject,
+		photo:[SCHEMA_DEFINITION_PROPERTY.optionalNullObject],
 		status:{...SCHEMA_DEFINITION_PROPERTY.optionalNullString,default:"PENDING"}
 	},
 	{ ...GENERAL_SCHEMA_OPTIONS, toJSON: { virtuals: true }, toObject: { virtuals: true } }

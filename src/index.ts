@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
-import { json } from "body-parser";
+import bodyParser, { json } from "body-parser";
 import http from "http";
 import connectDb from "./config/db.config";
 import cron from "node-cron"
@@ -39,6 +39,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", require("./api/v1/routers/routes.index"));
+// Middleware
+app.use(bodyParser.json());
 
 
 connectDb();
