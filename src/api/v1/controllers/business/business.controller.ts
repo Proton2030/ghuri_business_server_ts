@@ -75,3 +75,65 @@ export const getBusiness = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+
+export const getFilteredBusiness = async (req: Request, res: Response) => {
+    try {
+        const filter = { ...req.query };
+
+        const businesses = await BussinessModel.find(filter)
+
+        res.status(200).json({
+            message: MESSAGE.get.succ,
+            result: businesses
+        });
+    } catch (error) {
+        console.error('Error fetching businesses:', error);
+        res.status(400).json({
+            message: MESSAGE.get.fail
+        });
+    }
+};
+
+
+export const editBusinessStatusById = async (req: Request, res: Response) => {
+    try {
+        const { id ,status } = req.body;
+
+        const updatedBusiness = await BussinessModel.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: MESSAGE.patch.succ,
+            result: updatedBusiness
+        });
+    } catch (error) {
+        console.error('Error updating business status:', error);
+        res.status(400).json({
+            message: MESSAGE.patch.fail,
+        });
+    }
+};
+
+
+export const deleteBusinessById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        const deletedBusiness = await BussinessModel.findByIdAndDelete(id);
+
+        res.status(200).json({
+            message: MESSAGE.delete.succ,
+            result: deletedBusiness
+        });
+    } catch (error) {
+        console.error('Error deleting business:', error);
+        res.status(500).json({
+            message: MESSAGE.delete.fail,
+        });
+    }
+};
