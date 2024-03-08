@@ -4,7 +4,7 @@ import { MESSAGE } from "../../../../../constants/message";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
-    const { full_name, email,photo_url } = req.body;
+    const { full_name, email, photo_url } = req.body;
     const existingUser = await UserModel.findOne({ email: email });
 
     if (existingUser) {

@@ -7,7 +7,8 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get('/getBusiness', getBusiness); 
+router.get('/getBusiness', getBusiness);
+
 router.get('/getFilteredBusiness', getFilteredBusiness); 
 
 router.post('/postBusiness', upload.any(), createBusiness); 

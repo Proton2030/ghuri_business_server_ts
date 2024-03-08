@@ -54,6 +54,7 @@ export const getBusiness = async (req: Request, res: Response) => {
         const businesses = await BussinessModel.find()
             .skip(startIndex)
             .limit(limit)
+            .populate("user_details")
             .exec();
 
         const results = {

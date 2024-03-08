@@ -7,7 +7,6 @@ export interface IBussinessSchema {
     email:string;
     location:string;
     description:string,
-    phone:string,
     photo:string[],
     status:string
 }
