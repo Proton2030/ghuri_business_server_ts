@@ -79,23 +79,8 @@ export const getBusiness = async (req: Request, res: Response) => {
 
 
 
-export const getFilteredBusiness = async (req: Request, res: Response) => {
-    try {
-        const filter = { ...req.query };
 
-        const businesses = await BussinessModel.find(filter)
 
-        res.status(200).json({
-            message: MESSAGE.get.succ,
-            result: businesses
-        });
-    } catch (error) {
-        console.error('Error fetching businesses:', error);
-        res.status(400).json({
-            message: MESSAGE.get.fail
-        });
-    }
-};
 
 
 export const editBusinessStatusById = async (req: Request, res: Response) => {
@@ -123,7 +108,7 @@ export const editBusinessStatusById = async (req: Request, res: Response) => {
 
 export const deleteBusinessById = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
 
         const deletedBusiness = await BussinessModel.findByIdAndDelete(id);
 
@@ -135,6 +120,38 @@ export const deleteBusinessById = async (req: Request, res: Response) => {
         console.error('Error deleting business:', error);
         res.status(500).json({
             message: MESSAGE.delete.fail,
+        });
+    }
+};
+
+export const getFilteredBusiness = async (req: Request, res: Response) => {
+    try {
+        let { page = '1', ...filter } = { ...req.query };
+        const currentPage = parseInt(page as string); // Parse page as integer
+        
+        const limit = 5;
+
+        const startIndex = (currentPage - 1) * limit;
+        const endIndex = currentPage * limit;
+
+        const totalCount = await BussinessModel.countDocuments(filter);
+
+        const businesses = await BussinessModel.find(filter)
+            .skip(startIndex)
+            .limit(limit);
+
+        res.status(200).json({
+            message: 'Successfully retrieved businesses',
+            pagination: {
+                total: totalCount,
+                currentPage: currentPage
+            },
+            result: businesses,
+        });
+    } catch (error) {
+        console.error('Error fetching businesses:', error);
+        res.status(400).json({
+            message: 'Failed to retrieve businesses'
         });
     }
 };
