@@ -11,7 +11,7 @@ router.get('/getBusiness', getBusiness);
 
 router.get('/getFilteredBusiness', getFilteredBusiness); 
 
-router.post('/postBusiness', upload.any(), createBusiness); 
+router.post('/postBusiness', upload.fields([{ name: "images", maxCount: 10 }]), createBusiness); 
 
 router.patch('/editBusiness', editBusinessStatusById); 
 

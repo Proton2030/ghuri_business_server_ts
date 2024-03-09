@@ -10,7 +10,14 @@ export const createBusiness = async (req: Request, res: Response) => {
 
         const { user_object_id, name, phone_no, description, location, email } = req.body;
 
-        const images = (req.files as Express.Multer.File[]).map((file: Express.Multer.File) => {
+        if (!req.files || !("images" in req.files)) {
+            console.log("files",JSON.stringify(req.files));
+            return res.status(404).json({
+                message: MESSAGE.post.custom("Image files not found"),
+            });
+        }
+
+        const images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
             const dataUri = parser.format(file.originalname, file.buffer);
             return dataUri.content;
         });
@@ -78,11 +85,6 @@ export const getBusiness = async (req: Request, res: Response) => {
 };
 
 
-
-
-
-
-
 export const editBusinessStatusById = async (req: Request, res: Response) => {
     try {
         const { id ,status } = req.body;
@@ -141,7 +143,7 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
             .limit(limit);
 
         res.status(200).json({
-            message: 'Successfully retrieved businesses',
+            message: MESSAGE.get.succ,
             pagination: {
                 total: totalCount,
                 currentPage: currentPage
