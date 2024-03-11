@@ -8,7 +8,7 @@ const parser = new DatauriParser();
 export const createBusiness = async (req: Request, res: Response) => {
     try {
 
-        const { user_object_id, name, phone_no, description, location, email } = req.body;
+        const { user_object_id, name, phone_no, description, location, email, category } = req.body;
 
         if (!req.files || !("images" in req.files)) {
             console.log("files",JSON.stringify(req.files));
@@ -29,6 +29,7 @@ export const createBusiness = async (req: Request, res: Response) => {
             description,
             location,
             email,
+            category,
             photo: images,
             status: 'PENDING'
         });
