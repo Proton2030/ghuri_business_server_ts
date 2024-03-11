@@ -1,20 +1,29 @@
-import express from 'express';
-import multer from 'multer';
-import { createBusiness, deleteBusinessById, editBusinessStatusById, getBusiness, getFilteredBusiness } from '../../controllers/business/business.controller';
+import express from "express";
+import multer from "multer";
+import {
+	createBusiness,
+	deleteBusinessById,
+	editBusinessDetailsById,
+	editBusinessStatusById,
+	getBusiness,
+	getFilteredBusiness
+} from "../../controllers/business/business.controller";
 
 const router = express.Router();
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get('/getBusiness', getBusiness);
+router.get("/getBusiness", getBusiness);
 
-router.get('/getFilteredBusiness', getFilteredBusiness); 
+router.get("/getFilteredBusiness", getFilteredBusiness);
 
-router.post('/postBusiness', upload.fields([{ name: "images", maxCount: 10 }]), createBusiness); 
+router.post("/postBusiness", upload.fields([{ name: "images", maxCount: 10 }]), createBusiness);
 
-router.patch('/editBusiness', editBusinessStatusById); 
+router.patch("/editBusiness", editBusinessStatusById);
 
-router.delete('/deleteBusiness', deleteBusinessById); 
+router.patch("/editBusinessDetailsById/:id", editBusinessDetailsById);
 
-module.exports = router ;
+router.delete("/deleteBusiness", deleteBusinessById);
+
+module.exports = router;
