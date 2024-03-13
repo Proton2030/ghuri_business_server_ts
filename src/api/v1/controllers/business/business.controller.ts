@@ -180,46 +180,41 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 	}
 };
 
-
-export const updateRatingBusiness = async (req: Request , res: Response) => {
+export const updateRatingBusiness = async (req: Request, res: Response) => {
 	try {
-		const {business_id, rating} = req.body;
-		
-		if (!business_id ||  !rating) {
-            return res.status(400).json({
-                message: MESSAGE.patch.fail
-            });
-        }
+		const { business_id, rating } = req.body;
 
+		if (!business_id || !rating) {
+			return res.status(400).json({
+				message: MESSAGE.patch.fail
+			});
+		}
 
 		const existingBusiness = await BussinessModel.findById(business_id);
-        if (!existingBusiness) {
-            return res.status(404).json({
-                message: MESSAGE.patch.fail
-            });
-        }
-		
+		if (!existingBusiness) {
+			return res.status(404).json({
+				message: MESSAGE.patch.fail
+			});
+		}
+
 		const avg_rating = existingBusiness.avg_rate;
 		const rating_number = existingBusiness.no_of_rates;
 
-		const newRating =( avg_rating*rating_number + rating) / (rating_number +1);
+		const newRating = (avg_rating * rating_number + rating) / (rating_number + 1);
 
 		const response = await BussinessModel.findByIdAndUpdate(business_id, {
 			$set: { avg_rate: newRating },
 			$inc: { no_of_rates: 1 }
-		})
-		
+		});
 
-        res.status(200).json({
-            message: MESSAGE.patch.succ,
-			result : response
-        });
-
-	
+		res.status(200).json({
+			message: MESSAGE.patch.succ,
+			result: {}
+		});
 	} catch (error) {
-		console.error("Error while posting rating" , error)
+		console.error("Error while posting rating", error);
 		res.status(400).json({
 			message: MESSAGE.patch.fail
-		})
+		});
 	}
-}
+};

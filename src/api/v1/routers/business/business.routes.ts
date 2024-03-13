@@ -27,7 +27,6 @@ router.patch("/editBusinessDetailsById/:id", editBusinessDetailsById);
 
 router.delete("/deleteBusiness", deleteBusinessById);
 
-router.patch("/ratingBusiness" , updateRatingBusiness);
-
+router.patch("/ratingBusiness", updateRatingBusiness);
 
 module.exports = router;
