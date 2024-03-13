@@ -12,6 +12,8 @@ const BussinessSchema: Schema<IBussinessSchema> = new Schema<IBussinessSchema>(
 		description: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		location: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		category: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
+		avg_rate: {...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0},
+		no_of_rates:{...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0},
 		email: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		photo: SCHEMA_DEFINITION_PROPERTY.optionalNullObject,
 		status: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullString, default: "PENDING" }

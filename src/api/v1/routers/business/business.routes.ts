@@ -6,7 +6,8 @@ import {
 	editBusinessDetailsById,
 	editBusinessStatusById,
 	getBusiness,
-	getFilteredBusiness
+	getFilteredBusiness,
+	updateRatingBusiness
 } from "../../controllers/business/business.controller";
 
 const router = express.Router();
@@ -25,5 +26,8 @@ router.patch("/editBusiness", editBusinessStatusById);
 router.patch("/editBusinessDetailsById/:id", editBusinessDetailsById);
 
 router.delete("/deleteBusiness", deleteBusinessById);
+
+router.patch("/ratingBusiness" , updateRatingBusiness);
+
 
 module.exports = router;

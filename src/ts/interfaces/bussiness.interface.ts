@@ -6,6 +6,8 @@ export interface IBussinessSchema {
 	phone_no: string;
 	email: string;
 	location: string;
+	avg_rate: number;
+	no_of_rates: number;
 	category: string;
 	description: string;
 	photo: string[];
