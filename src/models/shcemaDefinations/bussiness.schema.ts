@@ -12,11 +12,13 @@ const BussinessSchema: Schema<IBussinessSchema> = new Schema<IBussinessSchema>(
 		description: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		location: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		category: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
-		avg_rate: {...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0},
-		no_of_rates:{...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0},
+		avg_rate: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0 },
+		no_of_rates: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0 },
 		email: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		photo: SCHEMA_DEFINITION_PROPERTY.optionalNullObject,
-		status: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullString, default: "PENDING" }
+		status: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullString, default: "PENDING" },
+		is_active: SCHEMA_DEFINITION_PROPERTY.requiredBoolean,
+		pin_code: SCHEMA_DEFINITION_PROPERTY.requiredNumber
 	},
 	{ ...GENERAL_SCHEMA_OPTIONS, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

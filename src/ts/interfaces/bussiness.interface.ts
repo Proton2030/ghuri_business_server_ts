@@ -12,6 +12,8 @@ export interface IBussinessSchema {
 	description: string;
 	photo: string[];
 	status: string;
+	is_active: boolean;
+	pin_code: number;
 }
 
 export interface IBussiness extends IBussinessSchema, IObjectId {}
