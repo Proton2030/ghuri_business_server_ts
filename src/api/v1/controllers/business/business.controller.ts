@@ -7,8 +7,7 @@ const parser = new DatauriParser();
 
 export const createBusiness = async (req: Request, res: Response) => {
 	try {
-		const { user_object_id, name, phone_no, description, location, email, category, pin_code, is_active } =
-			req.body;
+		const { user_object_id, name, phone_no, description, location, email, category, pin_code } = req.body;
 
 		if (!req.files || !("images" in req.files)) {
 			console.log("files", JSON.stringify(req.files));
@@ -32,7 +31,6 @@ export const createBusiness = async (req: Request, res: Response) => {
 			email,
 			photo: images,
 			status: "PENDING",
-			is_active,
 			pin_code
 		});
 
@@ -53,8 +51,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 export const editBusinessDetailsById = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
-		const { user_object_id, name, phone_no, description, location, email, category, is_active, pin_code } =
-			req.body;
+		const { user_object_id, name, phone_no, description, location, email, category, pin_code } = req.body;
 
 		const updatedFields = {
 			user_object_id,
@@ -64,7 +61,6 @@ export const editBusinessDetailsById = async (req: Request, res: Response) => {
 			location,
 			email,
 			category,
-			is_active,
 			pin_code
 		};
 
