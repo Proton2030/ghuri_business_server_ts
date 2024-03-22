@@ -2,8 +2,16 @@ import { Request, Response } from "express";
 import DatauriParser from "datauri/parser";
 import BussinessModel from "../../../../models/bussiness.model";
 import { MESSAGE } from "../../../../constants/message";
+import axios from "axios";
+import getDistanceByLatLon from "../../../../services/latlon_km/getDistanceInKm";
 
 const parser = new DatauriParser();
+
+const latlongDatabase = [
+	{ latitude: 12.345, longitude: 67.89, city: "Sample City 1" },
+	{ latitude: -23.456, longitude: 45.678, city: "Sample City 2" },
+	{ latitude: 0, longitude: 0, city: "Null Island" }
+];
 
 export const createBusiness = async (req: Request, res: Response) => {
 	try {
@@ -217,6 +225,46 @@ export const updateRatingBusiness = async (req: Request, res: Response) => {
 		console.error("Error while posting rating", error);
 		res.status(400).json({
 			message: MESSAGE.patch.fail
+		});
+	}
+};
+
+export const pincodeToLatLon = async (req: Request, res: Response) => {
+	try {
+		const userPincode = req.body.pin_code;
+		const userApiUrl = `https://nominatim.openstreetmap.org/search?format=json&postalcode=${userPincode}`;
+
+		const userResponse = await axios.get(userApiUrl);
+
+		if (userResponse.data.length === 0) {
+			return res.json({
+				success: false,
+				message: "No results found for the provided user pin code"
+			});
+		}
+
+		const userLatitude = parseFloat(userResponse.data[0].lat);
+		const userLongitude = parseFloat(userResponse.data[0].lon);
+
+		const latlonDatabase = await BussinessModel.find({}, "lat lon name description location category photo").select(
+			"photo"
+		);
+
+		const locationsWithDistances = latlonDatabase.map((location) => {
+			const distance = getDistanceByLatLon(userLatitude, userLongitude, location.lat, location.lon);
+			return { ...location.toObject(), distance };
+		});
+
+		const sortedLocations = locationsWithDistances.sort((a, b) => a.distance - b.distance);
+
+		res.status(200).json({
+			message: MESSAGE.patch.succ,
+			result: { sortedLocations }
+		});
+	} catch (error) {
+		console.log("Error while posting latlon", error);
+		res.status(400).json({
+			message: "Error occurred while processing the request"
 		});
 	}
 };

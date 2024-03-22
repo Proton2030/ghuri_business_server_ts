@@ -7,6 +7,7 @@ import {
 	editBusinessStatusById,
 	getBusiness,
 	getFilteredBusiness,
+	pincodeToLatLon,
 	updateRatingBusiness
 } from "../../controllers/business/business.controller";
 
@@ -28,5 +29,7 @@ router.patch("/editBusinessDetailsById/:id", editBusinessDetailsById);
 router.delete("/deleteBusiness", deleteBusinessById);
 
 router.patch("/ratingBusiness", updateRatingBusiness);
+
+router.get("/sortestDistance", pincodeToLatLon);
 
 module.exports = router;
