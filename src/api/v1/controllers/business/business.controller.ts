@@ -51,7 +51,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 export const editBusinessDetailsById = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
-		const { user_object_id, name, phone_no, description, location, email, category, pin_code } = req.body;
+		const { user_object_id, name, phone_no, description, location, email, category, pin_code, lat } = req.body;
 
 		const updatedFields = {
 			user_object_id,
