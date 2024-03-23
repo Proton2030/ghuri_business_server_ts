@@ -4,6 +4,7 @@ import BussinessModel from "../../../../models/bussiness.model";
 import { MESSAGE } from "../../../../constants/message";
 import axios from "axios";
 import getDistanceByLatLon from "../../../../services/latlon_km/getDistanceInKm";
+import NotificationModel from "../../../../models/notification.model";
 
 const parser = new DatauriParser();
 
@@ -265,6 +266,24 @@ export const pincodeToLatLon = async (req: Request, res: Response) => {
 		console.log("Error while posting latlon", error);
 		res.status(400).json({
 			message: "Error occurred while processing the request"
+		});
+	}
+};
+
+export const getNotification = async (req: Request, res: Response) => {
+	try {
+		const { user_object_id } = req.query;
+
+		const notificationsList = await NotificationModel.find({ user_object_id: user_object_id }).lean();
+
+		return res.status(200).json({
+			message: MESSAGE.get.succ,
+			result: notificationsList
+		});
+	} catch (error) {
+		console.log("Error while fetching notification", error);
+		res.status(500).json({
+			message: "Failed to retrieve notifications"
 		});
 	}
 };
