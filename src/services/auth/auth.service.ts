@@ -17,7 +17,6 @@ export const isDuplicateUserEmailService = async (userMOdel: Model<any>, email: 
 	}
 };
 
-
 export const hashPassword = async (password: string): Promise<string> => {
 	const salt = await bcrypt.genSalt(10);
 	const encryptPassword = await bcrypt.hash(password, salt);
