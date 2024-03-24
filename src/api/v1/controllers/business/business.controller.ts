@@ -239,8 +239,7 @@ export const pincodeToLatLon = async (req: Request, res: Response) => {
 
 		if (userResponse.data.length === 0) {
 			return res.json({
-				success: false,
-				message: "No results found for the provided user pin code"
+				message: MESSAGE.get.fail
 			});
 		}
 
