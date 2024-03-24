@@ -265,7 +265,7 @@ export const pincodeToLatLon = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.log("Error while posting latlon", error);
 		res.status(400).json({
-			message: "Error occurred while processing the request"
+			message: MESSAGE.get.fail
 		});
 	}
 };
