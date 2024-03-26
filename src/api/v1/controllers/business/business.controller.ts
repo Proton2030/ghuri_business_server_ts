@@ -101,9 +101,9 @@ export const getBusiness = async (req: Request, res: Response) => {
 		const startIndex = (page - 1) * limit;
 		const endIndex = page * limit;
 
-		const totalCount = await BussinessModel.countDocuments().exec();
+		const totalCount = await BussinessModel.countDocuments();
 
-		const businesses = await BussinessModel.find().skip(startIndex).limit(limit).populate("user_details").exec();
+		const businesses = await BussinessModel.find().skip(startIndex).limit(limit);
 
 		const results = {
 			businesses,
