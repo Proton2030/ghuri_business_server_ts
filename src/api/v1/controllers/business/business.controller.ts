@@ -232,15 +232,14 @@ export const updateRatingBusiness = async (req: Request, res: Response) => {
 
 export const pincodeToLatLon = async (req: Request, res: Response) => {
 	try {
-		const userPincode = req.body.pin_code;
-		const userApiUrl = `https://nominatim.openstreetmap.org/search?format=json&postalcode=${userPincode}`;
+		const { pin_code } = req.query;
+		const userApiUrl = `https://nominatim.openstreetmap.org/search?format=json&postalcode=${pin_code}`;
 
 		const userResponse = await axios.get(userApiUrl);
 
 		if (userResponse.data.length === 0) {
 			return res.json({
-				success: false,
-				message: "No results found for the provided user pin code"
+				message: MESSAGE.get.fail
 			});
 		}
 
@@ -259,13 +258,13 @@ export const pincodeToLatLon = async (req: Request, res: Response) => {
 		const sortedLocations = locationsWithDistances.sort((a, b) => a.distance - b.distance);
 
 		res.status(200).json({
-			message: MESSAGE.patch.succ,
-			result: { sortedLocations }
+			message: MESSAGE.get.succ,
+			result: sortedLocations
 		});
 	} catch (error) {
 		console.log("Error while posting latlon", error);
 		res.status(400).json({
-			message: "Error occurred while processing the request"
+			message: MESSAGE.get.fail
 		});
 	}
 };
