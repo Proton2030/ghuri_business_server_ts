@@ -5,14 +5,9 @@ import { MESSAGE } from "../../../../constants/message";
 import axios from "axios";
 import getDistanceByLatLon from "../../../../services/latlon_km/getDistanceInKm";
 import NotificationModel from "../../../../models/notification.model";
+import { createNotification } from "../../../../services/notification/notification.service";
 
 const parser = new DatauriParser();
-
-const latlongDatabase = [
-	{ latitude: 12.345, longitude: 67.89, city: "Sample City 1" },
-	{ latitude: -23.456, longitude: 45.678, city: "Sample City 2" },
-	{ latitude: 0, longitude: 0, city: "Null Island" }
-];
 
 export const createBusiness = async (req: Request, res: Response) => {
 	try {
@@ -131,6 +126,16 @@ export const editBusinessStatusById = async (req: Request, res: Response) => {
 
 		const updatedBusiness = await BussinessModel.findByIdAndUpdate(id, { status }, { new: true });
 
+		const business = await BussinessModel.findById(id);
+		if(business){
+			if(status==="ACTIVE"){
+				await createNotification(business.user_object_id,`Your Post ${business.name} is approved by Admin`);
+			}
+			else if(status==="REJECTED"){
+				await createNotification(business.user_object_id,`Your Post ${business.name} is rejected by Admin`);
+			}
+		}
+
 		res.status(200).json({
 			message: MESSAGE.patch.succ,
 			result: updatedBusiness
@@ -163,7 +168,7 @@ export const deleteBusinessById = async (req: Request, res: Response) => {
 
 export const getFilteredBusiness = async (req: Request, res: Response) => {
 	try {
-		let { page = "1", ...filter } = { ...req.query };
+		const { page = "1", ...filter } = { ...req.query };
 		const currentPage = parseInt(page as string); // Parse page as integer
 
 		const limit = 5;
