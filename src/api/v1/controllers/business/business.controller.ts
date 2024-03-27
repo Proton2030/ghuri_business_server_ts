@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import DatauriParser from "datauri/parser";
 import BussinessModel from "../../../../models/bussiness.model";
 import { MESSAGE } from "../../../../constants/message";
-import axios from "axios";
 
 import NotificationModel from "../../../../models/notification.model";
 import getLatLonByCityName from "../../../../services/LatLonFromCityName/getLatLonByCityName";
+import { createNotification } from "../../../../services/notification/notification.service";
 
 const parser = new DatauriParser();
 
@@ -171,8 +171,7 @@ export const deleteBusinessById = async (req: Request, res: Response) => {
 
 export const getFilteredBusiness = async (req: Request, res: Response) => {
 	try {
-		const { page = "1", ...filter } = { ...req.query };
-		const { page = "1", ...filter } = { ...req.query };
+		const { page = "1", filter } = req.query;
 		const currentPage = parseInt(page as string); // Parse page as integer
 
 		const limit = 5;
@@ -180,9 +179,9 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 		const startIndex = (currentPage - 1) * limit;
 		const endIndex = currentPage * limit;
 
-		const totalCount = await BussinessModel.countDocuments(filter);
+		const totalCount = await BussinessModel.countDocuments({filter});
 
-		const businesses = await BussinessModel.find(filter).skip(startIndex).limit(limit);
+		const businesses = await BussinessModel.find({filter}).skip(startIndex).limit(limit);
 
 		res.status(200).json({
 			message: MESSAGE.get.succ,
