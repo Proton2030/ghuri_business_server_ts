@@ -8,7 +8,7 @@ import {
 	getBusiness,
 	getFilteredBusiness,
 	getNotification,
-	pincodeToLatLon,
+	// pincodeToLatLon,
 	updateRatingBusiness
 } from "../../controllers/business/business.controller";
 
@@ -31,7 +31,7 @@ router.delete("/deleteBusiness", deleteBusinessById);
 
 router.patch("/ratingBusiness", updateRatingBusiness);
 
-router.get("/sortestDistance", pincodeToLatLon);
+// router.get("/sortestDistance", pincodeToLatLon);
 
 router.get("/getNotification", getNotification);
 module.exports = router;

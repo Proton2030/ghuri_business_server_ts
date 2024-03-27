@@ -18,9 +18,8 @@ const BussinessSchema: Schema<IBussinessSchema> = new Schema<IBussinessSchema>(
 		photo: SCHEMA_DEFINITION_PROPERTY.optionalNullObject,
 		status: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullString, default: "PENDING" },
 		is_active: SCHEMA_DEFINITION_PROPERTY.optionalBoolean,
-		pin_code: SCHEMA_DEFINITION_PROPERTY.requiredNumber,
-		lat: SCHEMA_DEFINITION_PROPERTY.requiredNumber,
-		lon: SCHEMA_DEFINITION_PROPERTY.requiredNumber
+		lat: SCHEMA_DEFINITION_PROPERTY.optionalNullNumber,
+		lon: SCHEMA_DEFINITION_PROPERTY.optionalNullNumber
 	},
 	{ ...GENERAL_SCHEMA_OPTIONS, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
