@@ -3,9 +3,9 @@ import DatauriParser from "datauri/parser";
 import BussinessModel from "../../../../models/bussiness.model";
 import { MESSAGE } from "../../../../constants/message";
 import axios from "axios";
-import getDistanceByLatLon from "../../../../services/latlon_km/getDistanceInKm";
+
 import NotificationModel from "../../../../models/notification.model";
-import { createNotification } from "../../../../services/notification/notification.service";
+import getLatLonByCityName from "../../../../services/LatLonFromCityName/getLatLonByCityName";
 
 const parser = new DatauriParser();
 
@@ -25,6 +25,8 @@ export const createBusiness = async (req: Request, res: Response) => {
 			return dataUri.content;
 		});
 
+		const latLong = await getLatLonByCityName(location);
+
 		const newBusiness = new BussinessModel({
 			user_object_id,
 			category,
@@ -32,6 +34,8 @@ export const createBusiness = async (req: Request, res: Response) => {
 			phone_no,
 			description,
 			location,
+			lat: latLong?.latitude,
+			lon: latLong?.longitude,
 			email,
 			photo: images,
 			status: "PENDING",
@@ -127,12 +131,11 @@ export const editBusinessStatusById = async (req: Request, res: Response) => {
 		const updatedBusiness = await BussinessModel.findByIdAndUpdate(id, { status }, { new: true });
 
 		const business = await BussinessModel.findById(id);
-		if(business){
-			if(status==="ACTIVE"){
-				await createNotification(business.user_object_id,`Your Post ${business.name} is approved by Admin`);
-			}
-			else if(status==="REJECTED"){
-				await createNotification(business.user_object_id,`Your Post ${business.name} is rejected by Admin`);
+		if (business) {
+			if (status === "ACTIVE") {
+				await createNotification(business.user_object_id, `Your Post ${business.name} is approved by Admin`);
+			} else if (status === "REJECTED") {
+				await createNotification(business.user_object_id, `Your Post ${business.name} is rejected by Admin`);
 			}
 		}
 
@@ -168,6 +171,7 @@ export const deleteBusinessById = async (req: Request, res: Response) => {
 
 export const getFilteredBusiness = async (req: Request, res: Response) => {
 	try {
+		const { page = "1", ...filter } = { ...req.query };
 		const { page = "1", ...filter } = { ...req.query };
 		const currentPage = parseInt(page as string); // Parse page as integer
 
@@ -235,44 +239,44 @@ export const updateRatingBusiness = async (req: Request, res: Response) => {
 	}
 };
 
-export const pincodeToLatLon = async (req: Request, res: Response) => {
-	try {
-		const { pin_code } = req.query;
-		const userApiUrl = `https://nominatim.openstreetmap.org/search?format=json&postalcode=${pin_code}`;
+// export const pincodeToLatLon = async (req: Request, res: Response) => {
+// 	try {
+// 		const { pin_code } = req.query;
+// 		const userApiUrl = `https://nominatim.openstreetmap.org/search?format=json&postalcode=${pin_code}`;
 
-		const userResponse = await axios.get(userApiUrl);
+// 		const userResponse = await axios.get(userApiUrl);
 
-		if (userResponse.data.length === 0) {
-			return res.json({
-				message: MESSAGE.get.fail
-			});
-		}
+// 		if (userResponse.data.length === 0) {
+// 			return res.json({
+// 				message: MESSAGE.get.fail
+// 			});
+// 		}
 
-		const userLatitude = parseFloat(userResponse.data[0].lat);
-		const userLongitude = parseFloat(userResponse.data[0].lon);
+// 		const userLatitude = parseFloat(userResponse.data[0].lat);
+// 		const userLongitude = parseFloat(userResponse.data[0].lon);
 
-		const latlonDatabase = await BussinessModel.find({}, "lat lon name description location category photo").select(
-			"photo"
-		);
+// 		const latlonDatabase = await BussinessModel.find({}, "lat lon name description location category photo").select(
+// 			"photo"
+// 		);
 
-		const locationsWithDistances = latlonDatabase.map((location) => {
-			const distance = getDistanceByLatLon(userLatitude, userLongitude, location.lat, location.lon);
-			return { ...location.toObject(), distance };
-		});
+// 		const locationsWithDistances = latlonDatabase.map((location) => {
+// 			const distance = getDistanceByLatLon(userLatitude, userLongitude, location.lat, location.lon);
+// 			return { ...location.toObject(), distance };
+// 		});
 
-		const sortedLocations = locationsWithDistances.sort((a, b) => a.distance - b.distance);
+// 		const sortedLocations = locationsWithDistances.sort((a, b) => a.distance - b.distance);
 
-		res.status(200).json({
-			message: MESSAGE.get.succ,
-			result: sortedLocations
-		});
-	} catch (error) {
-		console.log("Error while posting latlon", error);
-		res.status(400).json({
-			message: MESSAGE.get.fail
-		});
-	}
-};
+// 		res.status(200).json({
+// 			message: MESSAGE.get.succ,
+// 			result: sortedLocations
+// 		});
+// 	} catch (error) {
+// 		console.log("Error while posting latlon", error);
+// 		res.status(400).json({
+// 			message: MESSAGE.get.fail
+// 		});
+// 	}
+// };
 
 export const getNotification = async (req: Request, res: Response) => {
 	try {
