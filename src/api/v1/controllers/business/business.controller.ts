@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import DatauriParser from "datauri/parser";
 import BussinessModel from "../../../../models/bussiness.model";
 import { MESSAGE } from "../../../../constants/message";
+import axios from "axios";
 
 import NotificationModel from "../../../../models/notification.model";
 import getLatLonByCityName from "../../../../services/LatLonFromCityName/getLatLonByCityName";
@@ -26,6 +27,8 @@ export const createBusiness = async (req: Request, res: Response) => {
 		});
 
 		const latLong = await getLatLonByCityName(location);
+
+		console.log("lat long", latLong);
 
 		const newBusiness = new BussinessModel({
 			user_object_id,
@@ -179,9 +182,9 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 		const startIndex = (currentPage - 1) * limit;
 		const endIndex = currentPage * limit;
 
-		const totalCount = await BussinessModel.countDocuments({filter});
+		const totalCount = await BussinessModel.countDocuments({ filter });
 
-		const businesses = await BussinessModel.find({filter}).skip(startIndex).limit(limit);
+		const businesses = await BussinessModel.find({ filter }).skip(startIndex).limit(limit);
 
 		res.status(200).json({
 			message: MESSAGE.get.succ,

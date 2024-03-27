@@ -13,7 +13,7 @@ export interface IBussinessSchema {
 	description: string;
 	photo: string[];
 	status: string;
-	pin_code: number;
+
 	lat: number;
 	lon: number;
 }
