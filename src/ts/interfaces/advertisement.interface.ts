@@ -1,7 +1,7 @@
 import { IObjectId } from "./objectId.interface";
 
 export interface IAddSchema {
-	image_url: string;
+	photo: string[];
 	target_url: string;
 	active: boolean;
 }

@@ -1,12 +1,26 @@
 import { Request, Response } from "express";
 import AddModel from "../../../../models/add.model";
 import { MESSAGE } from "../../../../constants/message";
+import DatauriParser from "datauri/parser";
+
+const parser = new DatauriParser();
 
 export const createAdvertisement = async (req: Request, res: Response) => {
 	try {
-		const { image_url, target_url, active } = req.body;
+		const { target_url, active } = req.body;
+		if (!req.files || !("images" in req.files)) {
+			console.log("files", JSON.stringify(req.files));
+			return res.status(404).json({
+				message: MESSAGE.post.custom("Image files not found")
+			});
+		}
+
+		const images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
+			const dataUri = parser.format(file.originalname, file.buffer);
+			return dataUri.content;
+		});
 		const newAdvertisement = new AddModel({
-			image_url: image_url,
+			photo: images,
 			target_url: target_url,
 			active: active
 		});

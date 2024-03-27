@@ -5,11 +5,15 @@ import {
 	editCategory,
 	getCategories
 } from "../../controllers/category/category.controller";
+import multer from "multer";
 const router = express.Router();
 
-router.route("/createCategory").post(createCategory);
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-router.route("/editCategory/:_id").patch(editCategory);
+router.post("/createCategory", upload.fields([{ name: "images", maxCount: 10 }]), createCategory);
+
+router.patch("/editCategory/:_id", upload.fields([{ name: "images", maxCount: 10 }]), editCategory);
 
 router.route("/getCategory").get(getCategories);
 

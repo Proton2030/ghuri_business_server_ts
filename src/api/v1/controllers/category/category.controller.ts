@@ -1,14 +1,29 @@
 import { Request, Response } from "express";
 import CategoryModel from "../../../../models/category.model";
 import { MESSAGE } from "../../../../constants/message";
+import DatauriParser from "datauri/parser";
+
+const parser = new DatauriParser();
 
 export const createCategory = async (req: Request, res: Response) => {
 	try {
 		const { category, is_active } = req.body;
+		if (!req.files || !("images" in req.files)) {
+			console.log("files", JSON.stringify(req.files));
+			return res.status(404).json({
+				message: MESSAGE.post.custom("Image files not found")
+			});
+		}
+
+		const images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
+			const dataUri = parser.format(file.originalname, file.buffer);
+			return dataUri.content;
+		});
 
 		const newCategory = new CategoryModel({
 			category,
-			is_active
+			is_active,
+			photo: images
 		});
 
 		const savedCategory = await newCategory.save();
@@ -30,8 +45,23 @@ export const editCategory = async (req: Request, res: Response) => {
 		const _id = req.params;
 
 		const { category, is_active } = req.body;
+		if (!req.files || !("images" in req.files)) {
+			console.log("files", JSON.stringify(req.files));
+			return res.status(404).json({
+				message: MESSAGE.post.custom("Image files not found")
+			});
+		}
 
-		const updatedCategory = await CategoryModel.findByIdAndUpdate(_id, { category, is_active }, { new: true });
+		const images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
+			const dataUri = parser.format(file.originalname, file.buffer);
+			return dataUri.content;
+		});
+
+		const updatedCategory = await CategoryModel.findByIdAndUpdate(
+			_id,
+			{ category, is_active, photo: images },
+			{ new: true }
+		);
 
 		if (!updatedCategory) {
 			return res.status(404).json({

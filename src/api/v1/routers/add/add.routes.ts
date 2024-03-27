@@ -5,10 +5,14 @@ import {
 	editAdvertisement,
 	getAdvertisements
 } from "../../controllers/add/add.controller";
+import multer from "multer";
 
 const router = express.Router();
 
-router.route("/createAdds").post(createAdvertisement);
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+router.post("/createAdds", upload.fields([{ name: "images", maxCount: 10 }]), createAdvertisement);
 
 router.route("/editAdds/:_id").patch(editAdvertisement);
 
