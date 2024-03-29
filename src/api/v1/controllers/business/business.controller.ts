@@ -184,7 +184,7 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 
 		const totalCount = await BussinessModel.countDocuments({ filter });
 
-		const businesses = await BussinessModel.find({ filter }).skip(startIndex).limit(limit);
+		const businesses = await BussinessModel.find({filter}).populate("user_details").skip(startIndex).limit(limit);
 
 		res.status(200).json({
 			message: MESSAGE.get.succ,
