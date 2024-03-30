@@ -174,8 +174,9 @@ export const deleteBusinessById = async (req: Request, res: Response) => {
 
 export const getFilteredBusiness = async (req: Request, res: Response) => {
 	try {
-		const filter:any = req.query;
+		const filter: any = req.query;
 		const currentPage = parseInt(String(filter.page || "1")); // Parse page as integer
+
 		const limit = 5;
 
 		if (filter && typeof filter.delete === "function") {
@@ -183,6 +184,10 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 		}
 
 		const startIndex = (currentPage - 1) * limit;
+
+		delete filter.page;
+
+		console.log("===>filter",filter);
 
 		const totalCount = await BussinessModel.countDocuments(filter);
 
