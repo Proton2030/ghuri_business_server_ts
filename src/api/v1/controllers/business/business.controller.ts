@@ -179,10 +179,6 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 
 		const limit = 5;
 
-		if (filter && typeof filter.delete === "function") {
-			filter.delete("page");
-		}
-
 		const startIndex = (currentPage - 1) * limit;
 
 		delete filter.page;
