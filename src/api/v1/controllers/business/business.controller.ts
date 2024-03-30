@@ -174,17 +174,19 @@ export const deleteBusinessById = async (req: Request, res: Response) => {
 
 export const getFilteredBusiness = async (req: Request, res: Response) => {
 	try {
-		const { page = "1", filter } = req.query;
-		const currentPage = parseInt(page as string); // Parse page as integer
-
+		const filter:any = req.query;
+		const currentPage = parseInt(String(filter.page || "1")); // Parse page as integer
 		const limit = 5;
 
+		if (filter && typeof filter.delete === "function") {
+			filter.delete("page");
+		}
+
 		const startIndex = (currentPage - 1) * limit;
-		const endIndex = currentPage * limit;
 
-		const totalCount = await BussinessModel.countDocuments({ filter });
+		const totalCount = await BussinessModel.countDocuments(filter);
 
-		const businesses = await BussinessModel.find({filter}).populate("user_details").skip(startIndex).limit(limit);
+		const businesses = await BussinessModel.find(filter).populate("user_details").skip(startIndex).limit(limit);
 
 		res.status(200).json({
 			message: MESSAGE.get.succ,
