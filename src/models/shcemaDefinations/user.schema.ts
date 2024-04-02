@@ -7,7 +7,8 @@ const UserSchema: Schema<IUserDetails> = new Schema<IUserDetails>(
 	{
 		full_name: SCHEMA_DEFINITION_PROPERTY.requiredString,
 		email: SCHEMA_DEFINITION_PROPERTY.requiredString,
-		photo_url: SCHEMA_DEFINITION_PROPERTY.optionalNullString
+		photo_url: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
+		device_token: SCHEMA_DEFINITION_PROPERTY.optionalNullString
 	},
 	GENERAL_SCHEMA_OPTIONS
 );

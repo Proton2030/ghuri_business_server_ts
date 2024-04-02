@@ -4,8 +4,8 @@ import { MESSAGE } from "../../../../../constants/message";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
-    const { full_name, email, photo_url } = req.body;
-    const existingUser = await UserModel.findOne({ email: email });
+    const payload = req.body;
+    const existingUser = await UserModel.findOne({ email: payload.email });
 
     if (existingUser) {
       return res.status(200).json({
@@ -14,11 +14,7 @@ export const userLogin = async (req: Request, res: Response) => {
       });
     }
     
-    const newUser = new UserModel({
-      full_name: full_name,
-      email: email,
-      photo_url:photo_url
-    });
+    const newUser = new UserModel(payload);
 
     const reseponse = await newUser.save();
 
