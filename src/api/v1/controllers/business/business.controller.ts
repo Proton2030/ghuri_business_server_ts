@@ -12,7 +12,7 @@ const parser = new DatauriParser();
 
 export const createBusiness = async (req: Request, res: Response) => {
 	try {
-		const { user_object_id, name, phone_no, description, location, email, category, pin_code } = req.body;
+		const { user_object_id, name, phone_no, description, location, email, category, pin_code, has_acurate_lat_long,latitude,longitude  } = req.body;
 
 		if (!req.files || !("images" in req.files)) {
 			console.log("files", JSON.stringify(req.files));
@@ -26,7 +26,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 			return dataUri.content;
 		});
 
-		const latLong = await getLatLonByCityName(location);
+		const latLong = has_acurate_lat_long ? {latitude,longitude} : await getLatLonByCityName(location);
 
 		console.log("lat long", latLong);
 
