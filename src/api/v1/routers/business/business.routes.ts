@@ -6,8 +6,10 @@ import {
 	editBusinessDetailsById,
 	editBusinessStatusById,
 	getBusiness,
+	getBusinessRatingDetails,
 	getFilteredBusiness,
 	getNotification,
+	searchBusiness,
 	// pincodeToLatLon,
 	updateRatingBusiness
 } from "../../controllers/business/business.controller";
@@ -21,6 +23,8 @@ router.get("/getBusiness", getFilteredBusiness);
 
 router.get("/getFilteredBusiness", getFilteredBusiness);
 
+router.get("/getSearchBusiness", searchBusiness);
+
 router.post("/postBusiness", upload.fields([{ name: "images", maxCount: 10 }]), createBusiness);
 
 router.patch("/editBusiness", editBusinessStatusById);
@@ -30,6 +34,8 @@ router.patch("/editBusinessDetailsById/:id", editBusinessDetailsById);
 router.delete("/deleteBusiness", deleteBusinessById);
 
 router.patch("/ratingBusiness", updateRatingBusiness);
+
+router.get("/get-rating", getBusinessRatingDetails);
 
 // router.get("/sortestDistance", pincodeToLatLon);
 

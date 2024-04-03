@@ -43,24 +43,27 @@ export const createCategory = async (req: Request, res: Response) => {
 export const editCategory = async (req: Request, res: Response) => {
 	try {
 		const _id = req.params;
-
 		const { category, is_active } = req.body;
-		if (!req.files || !("images" in req.files)) {
-			console.log("files", JSON.stringify(req.files));
-			return res.status(404).json({
-				message: MESSAGE.post.custom("Image files not found")
+		let images: any = null;
+		if (req.files && "images" in req.files) {
+			images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
+				const dataUri = parser.format(file.originalname, file.buffer);
+				return dataUri.content;
 			});
 		}
 
-		const images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
-			const dataUri = parser.format(file.originalname, file.buffer);
-			return dataUri.content;
-		});
+		let payload:any = {
+			category,
+			is_active
+		};
+
+		if(images){
+			payload = {...payload, photo: [images]}
+		}
 
 		const updatedCategory = await CategoryModel.findByIdAndUpdate(
 			_id,
-			{ category, is_active, photo: images },
-			{ new: true }
+			{$set:payload}
 		);
 
 		if (!updatedCategory) {

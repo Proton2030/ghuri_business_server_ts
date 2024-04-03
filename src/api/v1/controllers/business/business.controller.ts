@@ -7,12 +7,28 @@ import axios from "axios";
 import NotificationModel from "../../../../models/notification.model";
 import getLatLonByCityName from "../../../../services/LatLonFromCityName/getLatLonByCityName";
 import { createNotification } from "../../../../services/notification/notification.service";
+import RatingModel from "../../../../models/rating.model";
+import { TrustProductsChannelEndpointAssignmentListInstance } from "twilio/lib/rest/trusthub/v1/trustProducts/trustProductsChannelEndpointAssignment";
+import { FilterQuery } from "mongoose";
+import { IBussiness } from "../../../../ts/interfaces/bussiness.interface";
 
 const parser = new DatauriParser();
 
 export const createBusiness = async (req: Request, res: Response) => {
 	try {
-		const { user_object_id, name, phone_no, description, location, email, category, pin_code, has_acurate_lat_long,latitude,longitude  } = req.body;
+		const {
+			user_object_id,
+			name,
+			phone_no,
+			description,
+			location,
+			email,
+			category,
+			pin_code,
+			has_acurate_lat_long,
+			latitude,
+			longitude
+		} = req.body;
 
 		if (!req.files || !("images" in req.files)) {
 			console.log("files", JSON.stringify(req.files));
@@ -26,7 +42,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 			return dataUri.content;
 		});
 
-		const latLong = has_acurate_lat_long ? {latitude,longitude} : await getLatLonByCityName(location);
+		const latLong = has_acurate_lat_long ? { latitude, longitude } : await getLatLonByCityName(location);
 
 		console.log("lat long", latLong);
 
@@ -183,7 +199,7 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 
 		delete filter.page;
 
-		console.log("===>filter",filter);
+		console.log("===>filter", filter);
 
 		const totalCount = await BussinessModel.countDocuments(filter);
 
@@ -205,17 +221,44 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 	}
 };
 
+export const searchBusiness = async (req: Request, res: Response) => {
+	try {
+		const {search_item, text} = req.query;
+
+		if(!search_item || !text){
+			return res.status(422).json({
+				message: MESSAGE.get.custom("Fields are empyty")
+			})
+		}
+
+		const query : FilterQuery<IBussiness>={}
+		query[search_item as unknown as string] = { $regex: new RegExp("^" + text, "i") };
+		const businesses = await BussinessModel.find(query).populate("user_details").lean();
+
+		res.status(200).json({
+			message: MESSAGE.get.succ,
+			result: businesses
+		});
+	} catch (error) {
+		console.error("Error fetching businesses:", error);
+		res.status(400).json({
+			message: MESSAGE.get.fail
+		});
+	}
+};
+
 export const updateRatingBusiness = async (req: Request, res: Response) => {
 	try {
-		const { business_id, rating } = req.body;
+		const { business_id, rating, user_object_id } = req.body;
 
-		if (!business_id || !rating) {
-			return res.status(400).json({
+		if (!business_id || !rating || !user_object_id) {
+			return res.status(422).json({
 				message: MESSAGE.patch.fail
 			});
 		}
 
 		const existingBusiness = await BussinessModel.findById(business_id);
+
 		if (!existingBusiness) {
 			return res.status(404).json({
 				message: MESSAGE.patch.fail
@@ -232,6 +275,17 @@ export const updateRatingBusiness = async (req: Request, res: Response) => {
 			$inc: { no_of_rates: 1 }
 		});
 
+		const existingRating = await RatingModel.findOne({ business_object_id: business_id, user_object_id });
+		if (existingRating) {
+			await RatingModel.findOneAndUpdate(
+				{ business_object_id: business_id, user_object_id },
+				{ $set: { rating: newRating } }
+			);
+		}
+		else{
+			await new RatingModel({ business_object_id: business_id, user_object_id, rating: newRating }).save();
+		}
+
 		res.status(200).json({
 			message: MESSAGE.patch.succ,
 			result: {}
@@ -240,6 +294,21 @@ export const updateRatingBusiness = async (req: Request, res: Response) => {
 		console.error("Error while posting rating", error);
 		res.status(400).json({
 			message: MESSAGE.patch.fail
+		});
+	}
+};
+
+export const getBusinessRatingDetails = async (req: Request, res: Response) => {
+	try {
+		const filter = req.query;
+		const ratingDetails = await RatingModel.find(filter).populate("user_details").lean();
+		return res.status(200).json({
+			message: MESSAGE.get.succ,
+			result: ratingDetails
+		});
+	} catch (error) {
+		return res.status(400).json({
+			message: MESSAGE.get.fail
 		});
 	}
 };
