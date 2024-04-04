@@ -58,7 +58,7 @@ export const editCategory = async (req: Request, res: Response) => {
 		};
 
 		if(images){
-			payload = {...payload, photo: [images]}
+			payload = {...payload, photo: images}
 		}
 
 		const updatedCategory = await CategoryModel.findByIdAndUpdate(
