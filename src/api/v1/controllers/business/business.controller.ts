@@ -48,7 +48,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 
 		const newBusiness = new BussinessModel({
 			user_object_id,
-			category,
+			category: category.toLowerCase(),
 			name,
 			phone_no,
 			description,
