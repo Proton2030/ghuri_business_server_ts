@@ -139,12 +139,14 @@ const editBusinessStatusById = (req, res) => __awaiter(void 0, void 0, void 0, f
     try {
         const { id, status } = req.body;
         const updatedBusiness = yield bussiness_model_1.default.findByIdAndUpdate(id, { status }, { new: true });
-        const business = yield bussiness_model_1.default.findById(id);
+        const business = yield bussiness_model_1.default.findOne({ _id: id });
         if (business) {
             if (status === "ACTIVE") {
+                console.log("====>Active");
                 yield (0, notification_service_1.createNotification)(business.user_object_id, `Your Post ${business.name} is approved by Admin`);
             }
             else if (status === "REJECTED") {
+                console.log("====>reject");
                 yield (0, notification_service_1.createNotification)(business.user_object_id, `Your Post ${business.name} is rejected by Admin`);
             }
         }

@@ -174,7 +174,6 @@ export const editBusinessStatusById = async (req: Request, res: Response) => {
 				await createNotification(business.user_object_id, `Your Post ${business.name} is rejected by Admin`);
 			}
 		}
-
 		res.status(200).json({
 			message: MESSAGE.patch.succ,
 			result: updatedBusiness
