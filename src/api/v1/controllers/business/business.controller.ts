@@ -164,11 +164,13 @@ export const editBusinessStatusById = async (req: Request, res: Response) => {
 
 		const updatedBusiness = await BussinessModel.findByIdAndUpdate(id, { status }, { new: true });
 
-		const business = await BussinessModel.findById(id);
+		const business = await BussinessModel.findOne({_id:id});
 		if (business) {
 			if (status === "ACTIVE") {
+				console.log("====>Active")
 				await createNotification(business.user_object_id, `Your Post ${business.name} is approved by Admin`);
 			} else if (status === "REJECTED") {
+				console.log("====>reject")
 				await createNotification(business.user_object_id, `Your Post ${business.name} is rejected by Admin`);
 			}
 		}
