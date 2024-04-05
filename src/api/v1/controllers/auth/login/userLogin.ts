@@ -8,6 +8,7 @@ export const userLogin = async (req: Request, res: Response) => {
     const existingUser = await UserModel.findOne({ email: payload.email });
 
     if (existingUser) {
+      await UserModel.findOneAndUpdate({email:payload.email},{$set:{device_token: payload.device_token}});
       return res.status(200).json({
         message:MESSAGE.post.succ,
         result:existingUser
