@@ -21,6 +21,7 @@ export const sendPushNotification = async (notification: IPushNotification, user
 				token: userInstance.device_token
 			};
 			// Send the message
+			console.log("====>message",message);
 			admin.messaging().send(message)
 				.then((response: any) => {
 					console.log("Successfully sent message:", response);
