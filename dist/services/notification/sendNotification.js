@@ -39,7 +39,7 @@ exports.sendPushNotification = void 0;
 const admin = __importStar(require("firebase-admin"));
 const user_model_1 = __importDefault(require("../../models/user.model"));
 // Replace the path with the actual path to your serviceAccountKey.json
-const serviceAccount = require("../config/service-account.json");
+const serviceAccount = require("../../config/service-account.json");
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
@@ -55,6 +55,7 @@ const sendPushNotification = (notification, userId) => __awaiter(void 0, void 0,
                 token: userInstance.device_token
             };
             // Send the message
+            console.log("====>message", message);
             admin.messaging().send(message)
                 .then((response) => {
                 console.log("Successfully sent message:", response);

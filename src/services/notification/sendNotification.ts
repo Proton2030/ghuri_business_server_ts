@@ -3,7 +3,7 @@ import { IPushNotification } from "../../ts/interfaces/pushNotification.types";
 import UserModel from "../../models/user.model";
 
 // Replace the path with the actual path to your serviceAccountKey.json
-const serviceAccount = require("../config/service-account.json");
+const serviceAccount = require("../../config/service-account.json");
 
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
