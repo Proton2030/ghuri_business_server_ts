@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start:dev": "ts-node-dev src/index.ts",
-    "start": "tsc --project tsconfig.json"
+    "start": "tsc --project tsconfig.json && node dist/index.js"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.3",
