@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import AddModel from "../../../../models/add.model";
 import { MESSAGE } from "../../../../constants/message";
 import DatauriParser from "datauri/parser";
+import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
 
 const parser = new DatauriParser();
 
@@ -15,10 +16,24 @@ export const createAdvertisement = async (req: Request, res: Response) => {
 			});
 		}
 
-		const images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
-			const dataUri = parser.format(file.originalname, file.buffer);
-			return dataUri.content;
-		});
+		// Ensure that req.files["images"] is of type Express.Multer.File[]
+		if (!Array.isArray(req.files["images"])) {
+			return res.status(400).json({
+				message: MESSAGE.post.custom("Invalid image files")
+			});
+		}
+
+		const images = await Promise.all(
+			(req.files["images"] as Express.Multer.File[]).map(async (file: Express.Multer.File) => {
+				// Convert the uploaded file to Data URI
+				const dataUri: any = parser.format(file.originalname, file.buffer);
+
+				// Upload the image to Cloudinary
+				const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
+
+				return cloudinaryUrl;
+			})
+		);
 		const newAdvertisement = new AddModel({
 			photo: images,
 			target_url: target_url,

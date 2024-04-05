@@ -11,6 +11,7 @@ import RatingModel from "../../../../models/rating.model";
 import { TrustProductsChannelEndpointAssignmentListInstance } from "twilio/lib/rest/trusthub/v1/trustProducts/trustProductsChannelEndpointAssignment";
 import { FilterQuery } from "mongoose";
 import { IBussiness } from "../../../../ts/interfaces/bussiness.interface";
+import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
 
 const parser = new DatauriParser();
 
@@ -37,10 +38,24 @@ export const createBusiness = async (req: Request, res: Response) => {
 			});
 		}
 
-		const images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
-			const dataUri = parser.format(file.originalname, file.buffer);
-			return dataUri.content;
-		});
+		// Ensure that req.files["images"] is of type Express.Multer.File[]
+		if (!Array.isArray(req.files["images"])) {
+			return res.status(400).json({
+				message: MESSAGE.post.custom("Invalid image files")
+			});
+		}
+
+		const images = await Promise.all(
+			(req.files["images"] as Express.Multer.File[]).map(async (file: Express.Multer.File) => {
+				// Convert the uploaded file to Data URI
+				const dataUri: any = parser.format(file.originalname, file.buffer);
+
+				// Upload the image to Cloudinary
+				const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
+
+				return cloudinaryUrl;
+			})
+		);
 
 		const latLong = has_acurate_lat_long ? { latitude, longitude } : await getLatLonByCityName(location);
 
@@ -223,15 +238,15 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 
 export const searchBusiness = async (req: Request, res: Response) => {
 	try {
-		const {search_item, text} = req.query;
+		const { search_item, text } = req.query;
 
-		if(!search_item || !text){
+		if (!search_item || !text) {
 			return res.status(422).json({
 				message: MESSAGE.get.custom("Fields are empyty")
-			})
+			});
 		}
 
-		const query : FilterQuery<IBussiness>={}
+		const query: FilterQuery<IBussiness> = {};
 		query[search_item as unknown as string] = { $regex: new RegExp("^" + text, "i") };
 		const businesses = await BussinessModel.find(query).populate("user_details").lean();
 
@@ -281,8 +296,7 @@ export const updateRatingBusiness = async (req: Request, res: Response) => {
 				{ business_object_id: business_id, user_object_id },
 				{ $set: { rating: newRating } }
 			);
-		}
-		else{
+		} else {
 			await new RatingModel({ business_object_id: business_id, user_object_id, rating: newRating }).save();
 		}
 
