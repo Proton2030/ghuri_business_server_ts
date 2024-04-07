@@ -8,6 +8,7 @@ import {
 	getBusiness,
 	getBusinessRatingDetails,
 	getFilteredBusiness,
+	getNearbyBusiness,
 	getNotification,
 	searchBusiness,
 	// pincodeToLatLon,
@@ -24,6 +25,8 @@ router.get("/getBusiness", getFilteredBusiness);
 router.get("/getFilteredBusiness", getFilteredBusiness);
 
 router.get("/getSearchBusiness", searchBusiness);
+
+router.get("/getNearbyBusiness", getNearbyBusiness);
 
 router.post("/postBusiness", upload.fields([{ name: "images", maxCount: 10 }]), createBusiness);
 

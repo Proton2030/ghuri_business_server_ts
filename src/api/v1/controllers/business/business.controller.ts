@@ -266,6 +266,88 @@ export const searchBusiness = async (req: Request, res: Response) => {
 	}
 };
 
+export const getNearbyBusiness = async (req: Request, res: Response) => {
+    try {
+        const filter = req.query;
+        const { page, limit, lat } = filter;
+
+		const currentPage = parseInt(String(page || "1"));
+
+		delete filter.page
+		delete filter.limit
+		delete filter.lat
+        
+        // Log the received query parameters for debugging
+        console.log("Received query parameters:", filter);
+
+		const totalCount = await BussinessModel.countDocuments(filter);
+
+        const response = await BussinessModel.aggregate([
+			{
+				"$match":filter
+			},
+			{
+				"$project":{
+					"name": 1,
+					"user_object_id": 1,
+                    "phone_no": 1,
+                    "email": 1,
+                    "location": 1,
+                    "is_active": 1,
+                    "avg_rate": 1,
+                    "no_of_rates": 1,
+                    "category": 1,
+                    "description": 1,
+                    "photo": 1,
+                    "status": 1,
+                    "lat": 1,
+                    "lon": 1
+				}
+			},
+            {
+                "$addFields": {
+                    "difference": { "$subtract": [Number(lat), "$lat"] }
+                }
+            },
+            {
+                "$sort": { "difference": 1 } // Sort by difference in descending order
+            },
+            {
+                "$skip": currentPage * Number(limit)
+            },
+            {
+                "$limit": Number(limit)
+            },
+            {
+                "$project": {
+                    "difference": 0, // Exclude the "difference" field from the projection
+                }
+            }
+        ]);
+
+        // Log the intermediate aggregation result for debugging
+        console.log("Intermediate aggregation result:", response);
+
+		await BussinessModel.populate(response, { path: "user_details" });
+
+        return res.status(200).json({
+            message: MESSAGE.get.succ,
+			pagination: {
+				total: totalCount,
+				currentPage: currentPage
+			},
+            result: response
+        });
+    } catch (error) {
+        console.error("Error:", error); // Log the caught error for debugging
+
+        return res.status(400).json({
+            message: MESSAGE.get.fail,
+            error
+        });
+    }
+}
+
 export const updateRatingBusiness = async (req: Request, res: Response) => {
 	try {
 		const { business_id, rating, user_object_id } = req.body;

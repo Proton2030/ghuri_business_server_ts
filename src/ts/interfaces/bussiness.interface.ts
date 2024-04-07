@@ -13,7 +13,6 @@ export interface IBussinessSchema {
 	description: string;
 	photo: string[];
 	status: string;
-
 	lat: number;
 	lon: number;
 }
