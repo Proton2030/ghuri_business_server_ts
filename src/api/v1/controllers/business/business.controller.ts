@@ -310,7 +310,7 @@ export const getNearbyBusiness = async (req: Request, res: Response) => {
                 }
             },
             {
-                "$sort": { "difference": 1 } // Sort by difference in descending order
+                "$sort": { "difference": -1 } // Sort by difference in descending order
             },
             {
                 "$skip": currentPage * Number(limit)
