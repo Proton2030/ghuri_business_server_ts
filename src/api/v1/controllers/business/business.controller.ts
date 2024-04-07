@@ -213,13 +213,16 @@ export const getFilteredBusiness = async (req: Request, res: Response) => {
 
 		const startIndex = (currentPage - 1) * limit;
 
+		const sortField = filter.sortField ? filter.sortField : "updatedAt";
+
 		delete filter.page;
+		delete filter.sortField
 
 		console.log("===>filter", filter);
 
 		const totalCount = await BussinessModel.countDocuments(filter);
 
-		const businesses = await BussinessModel.find(filter).populate("user_details").skip(startIndex).limit(limit);
+		const businesses = await BussinessModel.find(filter).sort({[sortField]:-1}).populate("user_details").skip(startIndex).limit(limit);
 
 		res.status(200).json({
 			message: MESSAGE.get.succ,
