@@ -68,12 +68,12 @@ export const createBusiness = async (req: Request, res: Response) => {
 			phone_no,
 			description,
 			address,
-			lat: latLong?.latitude,
-			lon: latLong?.longitude,
+			lat: Number(latLong?.latitude),
+			lon: Number(latLong?.longitude),
 			email,
 			location_2dsphere:{
 				type: "Point",
-				coordinates:[latLong?.latitude,latLong?.longitude]
+				coordinates:[Number(latLong?.longitude),Number(latLong?.latitude)]
 			},
 			photo: images,
 			status: "PENDING",
