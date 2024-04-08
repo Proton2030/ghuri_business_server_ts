@@ -55,6 +55,10 @@ const optionalNullObject: SchemaDefinitionProperty = {
 	type: Object,
 	default: null
 };
+const optionalNullArray: SchemaDefinitionProperty = {
+	type: Array,
+	default: []
+};
 
 const schemaDefintionProperty = {
 	requiredString,
@@ -67,7 +71,8 @@ const schemaDefintionProperty = {
 	optionalNullDate,
 	optionalNullObjectId,
 	requiredBoolean,
-	optionalNullObject
+	optionalNullObject,
+	optionalNullArray
 };
 
 const SCHEMA_DEFINITION_PROPERTY = schemaDefintionProperty;

@@ -5,7 +5,7 @@ export interface IBussinessSchema {
 	name: string;
 	phone_no: string;
 	email: string;
-	location: string;
+	address: string;
 	is_active: string;
 	avg_rate: number;
 	no_of_rates: number;
@@ -15,6 +15,10 @@ export interface IBussinessSchema {
 	status: string;
 	lat: number;
 	lon: number;
+	location_2dsphere:{
+		type:string,
+		coordinates: Array<number>
+	}
 }
 
 export interface IBussiness extends IBussinessSchema, IObjectId {}

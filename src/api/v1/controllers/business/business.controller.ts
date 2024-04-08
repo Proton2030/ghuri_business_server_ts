@@ -22,7 +22,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 			name,
 			phone_no,
 			description,
-			location,
+			address,
 			email,
 			category,
 			pin_code,
@@ -57,7 +57,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 			})
 		);
 
-		const latLong = has_acurate_lat_long ? { latitude, longitude } : await getLatLonByCityName(location);
+		const latLong = has_acurate_lat_long ? { latitude, longitude } : await getLatLonByCityName(address);
 
 		console.log("lat long", latLong);
 
@@ -67,10 +67,14 @@ export const createBusiness = async (req: Request, res: Response) => {
 			name,
 			phone_no,
 			description,
-			location,
+			address,
 			lat: latLong?.latitude,
 			lon: latLong?.longitude,
 			email,
+			location_2dsphere:{
+				type: "Point",
+				coordinates:[latLong?.latitude,latLong?.longitude]
+			},
 			photo: images,
 			status: "PENDING",
 			pin_code
@@ -269,12 +273,17 @@ export const searchBusiness = async (req: Request, res: Response) => {
 export const getNearbyBusiness = async (req: Request, res: Response) => {
     try {
         const filter = req.query;
-        const { page, limit, lat } = filter;
+        const { page, limit, lat,lon } = filter;
 
 		const currentPage = parseInt(String(page || "1"));
+		const _limit= Number(limit);
+		const startIndex = (currentPage - 1) * _limit;
+		const lattitude = lat
+		const longtitude = lon
 
 		delete filter.page
 		delete filter.limit
+		delete filter.lon
 		delete filter.lat
         
         // Log the received query parameters for debugging
@@ -282,53 +291,18 @@ export const getNearbyBusiness = async (req: Request, res: Response) => {
 
 		const totalCount = await BussinessModel.countDocuments(filter);
 
-        const response = await BussinessModel.aggregate([
-			{
-				"$match":filter
-			},
-			{
-				"$project":{
-					"name": 1,
-					"user_object_id": 1,
-                    "phone_no": 1,
-                    "email": 1,
-                    "location": 1,
-                    "is_active": 1,
-                    "avg_rate": 1,
-                    "no_of_rates": 1,
-                    "category": 1,
-                    "description": 1,
-                    "photo": 1,
-                    "status": 1,
-                    "lat": 1,
-                    "lon": 1
-				}
-			},
-            {
-                "$addFields": {
-                    "difference": { "$subtract": [Number(lat), "$lat"] }
-                }
-            },
-            {
-                "$sort": { "difference": -1 } // Sort by difference in descending order
-            },
-            {
-                "$skip": currentPage * Number(limit)
-            },
-            {
-                "$limit": Number(limit)
-            },
-            {
-                "$project": {
-                    "difference": 0, // Exclude the "difference" field from the projection
-                }
-            }
-        ]);
+        const response = await BussinessModel.find({...filter, location_2dsphere: {
+			$nearSphere: {
+			  $geometry: {
+				type: "Point",
+				coordinates: [longtitude, lattitude] // longitude first, then latitude
+			  },
+			  $maxDistance: 1000000000 // Example: specify the maximum distance in meters (adjust as needed)
+			}
+		  }}).populate("user_details").skip(startIndex).limit(_limit);
 
         // Log the intermediate aggregation result for debugging
-        console.log("Intermediate aggregation result:", response);
-
-		await BussinessModel.populate(response, { path: "user_details" });
+        console.log("Intermediate result:", response);
 
         return res.status(200).json({
             message: MESSAGE.get.succ,
