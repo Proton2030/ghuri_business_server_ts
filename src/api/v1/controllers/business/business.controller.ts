@@ -67,7 +67,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 			name,
 			phone_no,
 			description,
-			address,
+			address : address ? address : "",
 			lat: Number(latLong?.latitude),
 			lon: Number(latLong?.longitude),
 			email,
