@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNotification = exports.getBusinessRatingDetails = exports.updateRatingBusiness = exports.searchBusiness = exports.getFilteredBusiness = exports.deleteBusinessById = exports.editBusinessStatusById = exports.getBusiness = exports.editBusinessDetailsById = exports.createBusiness = void 0;
+exports.getNotification = exports.getBusinessRatingDetails = exports.updateRatingBusiness = exports.getNearbyBusiness = exports.searchBusiness = exports.getFilteredBusiness = exports.deleteBusinessById = exports.editBusinessStatusById = exports.getBusiness = exports.editBusinessDetailsById = exports.createBusiness = void 0;
 const parser_1 = __importDefault(require("datauri/parser"));
 const bussiness_model_1 = __importDefault(require("../../../../models/bussiness.model"));
 const message_1 = require("../../../../constants/message");
@@ -24,7 +24,7 @@ const UploadFile_1 = require("../../../../services/uploadFile/UploadFile");
 const parser = new parser_1.default();
 const createBusiness = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { user_object_id, name, phone_no, description, location, email, category, pin_code, has_acurate_lat_long, latitude, longitude } = req.body;
+        const { user_object_id, name, phone_no, description, address, email, category, pin_code, has_acurate_lat_long, latitude, longitude } = req.body;
         if (!req.files || !("images" in req.files)) {
             console.log("files", JSON.stringify(req.files));
             return res.status(404).json({
@@ -44,7 +44,7 @@ const createBusiness = (req, res) => __awaiter(void 0, void 0, void 0, function*
             const cloudinaryUrl = yield (0, UploadFile_1.CloudinaryUpload)(dataUri.content);
             return cloudinaryUrl;
         })));
-        const latLong = has_acurate_lat_long ? { latitude, longitude } : yield (0, getLatLonByCityName_1.default)(location);
+        const latLong = has_acurate_lat_long ? { latitude, longitude } : yield (0, getLatLonByCityName_1.default)(address);
         console.log("lat long", latLong);
         const newBusiness = new bussiness_model_1.default({
             user_object_id,
@@ -52,10 +52,14 @@ const createBusiness = (req, res) => __awaiter(void 0, void 0, void 0, function*
             name,
             phone_no,
             description,
-            location,
-            lat: latLong === null || latLong === void 0 ? void 0 : latLong.latitude,
-            lon: latLong === null || latLong === void 0 ? void 0 : latLong.longitude,
+            address: address ? address : "",
+            lat: Number(latLong === null || latLong === void 0 ? void 0 : latLong.latitude),
+            lon: Number(latLong === null || latLong === void 0 ? void 0 : latLong.longitude),
             email,
+            location_2dsphere: {
+                type: "Point",
+                coordinates: [Number(latLong === null || latLong === void 0 ? void 0 : latLong.longitude), Number(latLong === null || latLong === void 0 ? void 0 : latLong.latitude)]
+            },
             photo: images,
             status: "PENDING",
             pin_code
@@ -186,10 +190,12 @@ const getFilteredBusiness = (req, res) => __awaiter(void 0, void 0, void 0, func
         const currentPage = parseInt(String(filter.page || "1")); // Parse page as integer
         const limit = 5;
         const startIndex = (currentPage - 1) * limit;
+        const sortField = filter.sortField ? filter.sortField : "updatedAt";
         delete filter.page;
+        delete filter.sortField;
         console.log("===>filter", filter);
         const totalCount = yield bussiness_model_1.default.countDocuments(filter);
-        const businesses = yield bussiness_model_1.default.find(filter).populate("user_details").skip(startIndex).limit(limit);
+        const businesses = yield bussiness_model_1.default.find(filter).sort({ [sortField]: -1 }).populate("user_details").skip(startIndex).limit(limit);
         res.status(200).json({
             message: message_1.MESSAGE.get.succ,
             pagination: {
@@ -231,6 +237,51 @@ const searchBusiness = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.searchBusiness = searchBusiness;
+const getNearbyBusiness = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const filter = req.query;
+        const { page, limit, lat, lon } = filter;
+        const currentPage = parseInt(String(page || "1"));
+        const _limit = Number(limit);
+        const startIndex = (currentPage - 1) * _limit;
+        const lattitude = lat;
+        const longtitude = lon;
+        delete filter.page;
+        delete filter.limit;
+        delete filter.lon;
+        delete filter.lat;
+        // Log the received query parameters for debugging
+        console.log("Received query parameters:", filter);
+        const totalCount = yield bussiness_model_1.default.countDocuments(filter);
+        const response = yield bussiness_model_1.default.find(Object.assign(Object.assign({}, filter), { location_2dsphere: {
+                $nearSphere: {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [longtitude, lattitude] // longitude first, then latitude
+                    },
+                    $maxDistance: 1000000000 // Example: specify the maximum distance in meters (adjust as needed)
+                }
+            } })).populate("user_details").skip(startIndex).limit(_limit);
+        // Log the intermediate aggregation result for debugging
+        console.log("Intermediate result:", response);
+        return res.status(200).json({
+            message: message_1.MESSAGE.get.succ,
+            pagination: {
+                total: totalCount,
+                currentPage: currentPage
+            },
+            result: response
+        });
+    }
+    catch (error) {
+        console.error("Error:", error); // Log the caught error for debugging
+        return res.status(400).json({
+            message: message_1.MESSAGE.get.fail,
+            error
+        });
+    }
+});
+exports.getNearbyBusiness = getNearbyBusiness;
 const updateRatingBusiness = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { business_id, rating, user_object_id } = req.body;

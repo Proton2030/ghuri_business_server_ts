@@ -5,9 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const model_constant_1 = __importDefault(require("../../constants/model/model.constant"));
-const schemaOption_1 = require("../../constants/model/schemaOption");
-const notificationSchema = new mongoose_1.Schema({
-    user_object_id: model_constant_1.default.requiredObjectId,
-    notification_title: model_constant_1.default.requiredString
-}, schemaOption_1.GENERAL_SCHEMA_OPTIONS);
-exports.default = notificationSchema;
+const ThreadSchema = new mongoose_1.Schema({
+    thread_message: model_constant_1.default.requiredString
+});
+exports.default = ThreadSchema;

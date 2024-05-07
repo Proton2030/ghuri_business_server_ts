@@ -12,7 +12,7 @@ const BussinessSchema = new mongoose_1.Schema({
     name: model_constant_1.default.optionalNullString,
     phone_no: model_constant_1.default.optionalNullString,
     description: model_constant_1.default.optionalNullString,
-    location: model_constant_1.default.optionalNullString,
+    address: model_constant_1.default.optionalNullString,
     category: model_constant_1.default.optionalNullString,
     avg_rate: Object.assign(Object.assign({}, model_constant_1.default.optionalNullNumber), { default: 0 }),
     no_of_rates: Object.assign(Object.assign({}, model_constant_1.default.optionalNullNumber), { default: 0 }),
@@ -21,7 +21,11 @@ const BussinessSchema = new mongoose_1.Schema({
     status: Object.assign(Object.assign({}, model_constant_1.default.optionalNullString), { default: "PENDING" }),
     is_active: model_constant_1.default.optionalBoolean,
     lat: model_constant_1.default.optionalNullNumber,
-    lon: model_constant_1.default.optionalNullNumber
+    lon: model_constant_1.default.optionalNullNumber,
+    location_2dsphere: {
+        type: model_constant_1.default.optionalNullString,
+        coordinates: model_constant_1.default.optionalNullArray
+    }
 }, Object.assign(Object.assign({}, schemaOption_1.GENERAL_SCHEMA_OPTIONS), { toJSON: { virtuals: true }, toObject: { virtuals: true } }));
 const userVirtualReference = {
     ref: user_model_1.default,

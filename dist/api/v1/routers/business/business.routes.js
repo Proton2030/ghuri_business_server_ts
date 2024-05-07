@@ -12,6 +12,7 @@ const upload = (0, multer_1.default)({ storage: storage });
 router.get("/getBusiness", business_controller_1.getFilteredBusiness);
 router.get("/getFilteredBusiness", business_controller_1.getFilteredBusiness);
 router.get("/getSearchBusiness", business_controller_1.searchBusiness);
+router.get("/getNearbyBusiness", business_controller_1.getNearbyBusiness);
 router.post("/postBusiness", upload.fields([{ name: "images", maxCount: 10 }]), business_controller_1.createBusiness);
 router.patch("/editBusiness", business_controller_1.editBusinessStatusById);
 router.patch("/editBusinessDetailsById/:id", business_controller_1.editBusinessDetailsById);

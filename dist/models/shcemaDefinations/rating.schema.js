@@ -6,11 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const model_constant_1 = __importDefault(require("../../constants/model/model.constant"));
 const user_model_1 = __importDefault(require("../user.model"));
+const schemaOption_1 = require("../../constants/model/schemaOption");
 const ratingSchema = new mongoose_1.Schema({
     business_object_id: model_constant_1.default.requiredObjectId,
     user_object_id: model_constant_1.default.requiredObjectId,
     rating: model_constant_1.default.optionalNullNumber
-});
+}, Object.assign(Object.assign({}, schemaOption_1.GENERAL_SCHEMA_OPTIONS), { toJSON: { virtuals: true }, toObject: { virtuals: true } }));
 const userVirtualReference = {
     ref: user_model_1.default,
     localField: "user_object_id",
