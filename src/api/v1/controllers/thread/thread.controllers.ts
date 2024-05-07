@@ -8,10 +8,12 @@ const parser = new DatauriParser();
 
 export const createThread = async (req: Request, res: Response) => {
 	try {
-		const { thread_message } = req.body;
+		const { thread_message, name, profile_photo } = req.body;
 
 		const newThread = new ThreadModel({
-			thread_message: thread_message
+			thread_message: thread_message,
+			name: name,
+			profile_photo: profile_photo
 		});
 
 		const response = await newThread.save();

@@ -19,9 +19,11 @@ const thread_model_1 = __importDefault(require("../../../../models/thread.model"
 const parser = new parser_1.default();
 const createThread = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { thread_message } = req.body;
+        const { thread_message, name, profile_photo } = req.body;
         const newThread = new thread_model_1.default({
-            thread_message: thread_message
+            thread_message: thread_message,
+            name: name,
+            profile_photo: profile_photo
         });
         const response = yield newThread.save();
         return res.status(200).json({
