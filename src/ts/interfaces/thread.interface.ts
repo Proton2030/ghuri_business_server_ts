@@ -1,14 +1,9 @@
-import { IObjectId } from "./objectId.interface";
+import { SchemaDefinitionProperty, Types } from "mongoose";
 
 export interface IThreadSchema {
-	thread_message: string;
-	user_object_id: string;
-	thread_image_url: string;
-	name: string;
-	profile_photo: string;
+	message_body: string;
+	user_object_id: SchemaDefinitionProperty<Types.ObjectId>;
+	message_media_url: string;
 	like_count: number;
-	comment_count: number;
-	comment_message: string;
+	dislike_count: number;
 }
-
-export interface IThread extends IThreadSchema, IObjectId {}
