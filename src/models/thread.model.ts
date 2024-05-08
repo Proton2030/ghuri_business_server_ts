@@ -1,7 +1,7 @@
 import { model } from "mongoose";
-import { IThread } from "../ts/interfaces/thread.interface";
+import { IThreadSchema } from "../ts/interfaces/thread.interface";
 import ThreadSchema from "./shcemaDefinations/thread.schema";
 
-const ThreadModel = model<IThread>("ThreadSchema", ThreadSchema);
+const ThreadModel = model<IThreadSchema>("ThreadSchema", ThreadSchema);
 
 export default ThreadModel;
