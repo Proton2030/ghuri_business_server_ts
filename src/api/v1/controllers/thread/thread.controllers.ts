@@ -45,3 +45,35 @@ export const getThread = async (req: Request, res: Response) => {
 		});
 	}
 };
+
+export const likeCount = async (req: Request, res: Response) => {
+	try {
+		const { postId, likeCount, dislikeCount } = req.body;
+
+		const updatedPost = await ThreadModel.findByIdAndUpdate(
+			postId,
+			{
+				like_count: likeCount,
+				dislike_count: dislikeCount
+			},
+			{ new: true }
+		);
+
+		if (!updatedPost) {
+			return res.status(404).json({
+				message: MESSAGE.post.fail
+			});
+		}
+
+		return res.status(200).json({
+			message: MESSAGE.post.succ,
+			result: updatedPost
+		});
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({
+			message: MESSAGE.post.fail,
+			error: error
+		});
+	}
+};
