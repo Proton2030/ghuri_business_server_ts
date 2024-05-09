@@ -31,18 +31,38 @@ export const createThread = async (req: Request, res: Response) => {
 	}
 };
 
-export const getThread = async (req: Request, res: Response) => {
+export const getFilteredThread = async (req: Request, res: Response) => {
 	try {
-		const threadMessage = await ThreadModel.find();
-		return res.status(200).json({
+		const filter: any = req.query;
+		const currentPage = parseInt(String(filter.page || "1")); // Parse page as integer
+
+		const limit = 5;
+
+		const startIndex = (currentPage - 1) * limit;
+
+		const sortField = filter.sortField ? filter.sortField : "updatedAt";
+
+		delete filter.page;
+		delete filter.sortField
+
+		console.log("===>filter", filter);
+
+		const totalCount = await ThreadModel.countDocuments(filter);
+
+		const threadList = await ThreadModel.find(filter).sort({[sortField]:-1}).populate("user_details").skip(startIndex).limit(limit);
+
+		res.status(200).json({
 			message: MESSAGE.get.succ,
-			result: threadMessage
+			pagination: {
+				total: totalCount,
+				currentPage: currentPage
+			},
+			result: threadList
 		});
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({
-			message: MESSAGE.post.fail,
-			error: error
+		console.error("Error fetching businesses:", error);
+		res.status(400).json({
+			message: "Failed to retrieve businesses"
 		});
 	}
 };
