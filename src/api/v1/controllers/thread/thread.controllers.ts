@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { MESSAGE } from "../../../../constants/message";
 import DatauriParser from "datauri/parser";
 import ThreadModel from "../../../../models/thread.model";
+import ThreadCommentModel from "../../../../models/thread.comment.model";
 
 const parser = new DatauriParser();
 
@@ -72,6 +73,31 @@ export const likeCount = async (req: Request, res: Response) => {
 	} catch (error) {
 		console.error(error);
 		return res.status(500).json({
+			message: MESSAGE.post.fail,
+			error: error
+		});
+	}
+};
+
+export const createComment = async (req: Request, res: Response) => {
+	try {
+		const { comment_message, user_object_id, post_id } = req.body;
+
+		const newComment = new ThreadCommentModel({
+			comment_message: comment_message,
+			user_object_id: user_object_id,
+			post_id: post_id
+		});
+
+		const response = await newComment.save();
+
+		return res.status(200).json({
+			message: MESSAGE.post.succ,
+			result: response
+		});
+	} catch (error) {
+		console.error(error);
+		return res.status(400).json({
 			message: MESSAGE.post.fail,
 			error: error
 		});
