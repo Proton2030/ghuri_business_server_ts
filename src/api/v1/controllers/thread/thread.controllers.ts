@@ -43,13 +43,17 @@ export const getFilteredThread = async (req: Request, res: Response) => {
 		const sortField = filter.sortField ? filter.sortField : "updatedAt";
 
 		delete filter.page;
-		delete filter.sortField
+		delete filter.sortField;
 
 		console.log("===>filter", filter);
 
 		const totalCount = await ThreadModel.countDocuments(filter);
 
-		const threadList = await ThreadModel.find(filter).sort({[sortField]:-1}).populate("user_details").skip(startIndex).limit(limit);
+		const threadList = await ThreadModel.find(filter)
+			.sort({ [sortField]: -1 })
+			.populate("user_details")
+			.skip(startIndex)
+			.limit(limit);
 
 		res.status(200).json({
 			message: MESSAGE.get.succ,
@@ -110,6 +114,25 @@ export const createComment = async (req: Request, res: Response) => {
 		});
 
 		const response = await newComment.save();
+
+		return res.status(200).json({
+			message: MESSAGE.post.succ,
+			result: response
+		});
+	} catch (error) {
+		console.error(error);
+		return res.status(400).json({
+			message: MESSAGE.post.fail,
+			error: error
+		});
+	}
+};
+
+export const getComment = async (req: Request, res: Response) => {
+	try {
+		const { post_id } = req.query;
+
+		const response = await ThreadCommentModel.find({ post_id: post_id });
 
 		return res.status(200).json({
 			message: MESSAGE.post.succ,
