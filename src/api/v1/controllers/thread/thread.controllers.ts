@@ -132,7 +132,7 @@ export const getComment = async (req: Request, res: Response) => {
 	try {
 		const { post_id } = req.query;
 
-		const response = await ThreadCommentModel.find({ post_id: post_id });
+		const response = await ThreadCommentModel.find({ post_id: post_id }).populate("user_details");
 
 		return res.status(200).json({
 			message: MESSAGE.get.succ,
