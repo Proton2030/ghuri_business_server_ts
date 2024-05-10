@@ -114,7 +114,11 @@ export const createComment = async (req: Request, res: Response) => {
 		});
 
 		const response = await newComment.save();
-
+		if(response){
+			await ThreadModel.findByIdAndUpdate(post_id,{
+				$inc: { comments_count: 1 }
+			})
+		}
 		return res.status(200).json({
 			message: MESSAGE.post.succ,
 			result: response

@@ -9,6 +9,7 @@ const ThreadSchema: Schema<IThreadSchema> = new Schema<IThreadSchema>(
 		message_body: SCHEMA_DEFINITION_PROPERTY.requiredString,
 		like_count: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0 },
 		dislike_count: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0 },
+		comments_count: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0 },
 		message_media_url: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
 		user_object_id: SCHEMA_DEFINITION_PROPERTY.requiredObjectId
 	},
