@@ -135,13 +135,13 @@ export const getComment = async (req: Request, res: Response) => {
 		const response = await ThreadCommentModel.find({ post_id: post_id });
 
 		return res.status(200).json({
-			message: MESSAGE.post.succ,
+			message: MESSAGE.get.succ,
 			result: response
 		});
 	} catch (error) {
 		console.error(error);
 		return res.status(400).json({
-			message: MESSAGE.post.fail,
+			message: MESSAGE.get.fail,
 			error: error
 		});
 	}
