@@ -6,5 +6,6 @@ export interface IThreadSchema {
 	message_media_url: string;
 	like_count: number;
 	comments_count:number;
+	is_approved: boolean;
 	dislike_count: number;
 }

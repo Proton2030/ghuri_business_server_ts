@@ -6,10 +6,14 @@ import {
 	getFilteredThread,
 	likeCount
 } from "../../controllers/thread/thread.controllers";
+import multer from "multer";
 
 const router = express.Router();
 
-router.post("/createThread", createThread);
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+router.post("/createThread", upload.fields([{ name: "images", maxCount: 1 }]), createThread);
 router.route("/getThread").get(getFilteredThread);
 router.route("/likeCount").patch(likeCount);
 router.post("/createComment", createComment);

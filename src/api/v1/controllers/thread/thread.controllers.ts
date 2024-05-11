@@ -1,19 +1,47 @@
 import { Request, Response } from "express";
 
 import { MESSAGE } from "../../../../constants/message";
-import DatauriParser from "datauri/parser";
 import ThreadModel from "../../../../models/thread.model";
 import ThreadCommentModel from "../../../../models/thread.comment.model";
+import DataURIParser from "datauri/parser";
+import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
 
-const parser = new DatauriParser();
+const parser = new DataURIParser();
 
 export const createThread = async (req: Request, res: Response) => {
 	try {
 		const { message_body, user_object_id } = req.body;
 
+		if (!req.files || !("images" in req.files)) {
+			console.log("files", JSON.stringify(req.files));
+			return res.status(404).json({
+				message: MESSAGE.post.custom("Image files not found")
+			});
+		}
+
+		// Ensure that req.files["images"] is of type Express.Multer.File[]
+		if (!Array.isArray(req.files["images"])) {
+			return res.status(400).json({
+				message: MESSAGE.post.custom("Invalid image files")
+			});
+		}
+
+		const images = await Promise.all(
+			(req.files["images"] as Express.Multer.File[]).map(async (file: Express.Multer.File) => {
+				// Convert the uploaded file to Data URI
+				const dataUri: any = parser.format(file.originalname, file.buffer);
+
+				// Upload the image to Cloudinary
+				const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
+
+				return cloudinaryUrl;
+			})
+		);
+		
 		const newThread = new ThreadModel({
 			message_body: message_body,
-			user_object_id: user_object_id
+			user_object_id: user_object_id,
+			message_media_url: images[0]
 		});
 
 		const response = await newThread.save();

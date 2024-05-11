@@ -11,6 +11,7 @@ const ThreadSchema: Schema<IThreadSchema> = new Schema<IThreadSchema>(
 		dislike_count: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0 },
 		comments_count: { ...SCHEMA_DEFINITION_PROPERTY.optionalNullNumber, default: 0 },
 		message_media_url: SCHEMA_DEFINITION_PROPERTY.optionalNullString,
+		is_approved: SCHEMA_DEFINITION_PROPERTY.optionalBoolean,
 		user_object_id: SCHEMA_DEFINITION_PROPERTY.requiredObjectId
 	},
 	{ ...GENERAL_SCHEMA_OPTIONS, toJSON: { virtuals: true }, toObject: { virtuals: true } }
