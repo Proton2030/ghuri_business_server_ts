@@ -71,11 +71,11 @@ export const getFilteredThread = async (req: Request, res: Response) => {
 		const startIndex = (currentPage - 1) * limit;
 
 		const sortField = filter.sortField ? filter.sortField : "updatedAt";
-		const user_object_id = filter.user_object_id ? filter.user_object_id : null;
+		const user_object_id = filter.user_id ? filter.user_object_id : null;
 
 		delete filter.page;
 		delete filter.sortField;
-		delete filter.user_object_id;
+		delete filter.user_id;
 
 		console.log("===>filter", filter);
 
