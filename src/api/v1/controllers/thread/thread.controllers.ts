@@ -38,7 +38,7 @@ export const createThread = async (req: Request, res: Response) => {
 				return cloudinaryUrl;
 			})
 		);
-		
+
 		const newThread = new ThreadModel({
 			message_body: message_body,
 			user_object_id: user_object_id,
@@ -143,10 +143,10 @@ export const createComment = async (req: Request, res: Response) => {
 		});
 
 		const response = await newComment.save();
-		if(response){
-			await ThreadModel.findByIdAndUpdate(post_id,{
+		if (response) {
+			await ThreadModel.findByIdAndUpdate(post_id, {
 				$inc: { comments_count: 1 }
-			})
+			});
 		}
 		return res.status(200).json({
 			message: MESSAGE.post.succ,
@@ -187,53 +187,40 @@ export const createLike = async (req: Request, res: Response) => {
 		const is_liked = liked_status === "LIKE" ? true : false;
 		const is_disliked = liked_status === "DISLIKE" ? true : false;
 
-		const existingDisLike = await ThreadLikeModel.findOne({ user_object_id: user_object_id, post_id: post_id,is_disliked });
+		const existingLike = await ThreadLikeModel.findOne({ user_object_id: user_object_id, post_id: post_id });
 
-		if(existingDisLike){
-			await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id })
-			await ThreadModel.findByIdAndUpdate(post_id,{
-				$inc: { dislike_count: -1 }
-			})
-			if(is_liked){
-				const newLike = new ThreadLikeModel({
-					is_liked: is_liked,
-					is_disliked: is_disliked,
-					user_object_id: user_object_id,
-					post_id: post_id
+		if (existingLike) {
+			if (existingLike.is_liked === is_liked && existingLike.is_disliked === is_disliked) {
+				await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id });
+				await ThreadModel.findByIdAndUpdate(post_id, {
+					$inc: { like_count: is_liked ? -1 : 0, dislike_count: is_disliked ? -1 : 0 }
 				});
-				await newLike.save();
-				await ThreadModel.findByIdAndUpdate(post_id,{
-					$inc: { dislike_count: 1 }
-				})
-			}
-			return res.status(200).json({
-				message: MESSAGE.post.succ,
-				result: existingDisLike
-			});
-		}
-		const existingLike = await ThreadLikeModel.findOne({ user_object_id: user_object_id, post_id: post_id,is_liked });
-
-		if(existingLike){
-			await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id })
-			await ThreadModel.findByIdAndUpdate(post_id,{
-				$inc: { like_count: -1 }
-			})
-			if(is_disliked){
-				const newLike = new ThreadLikeModel({
-					is_liked: is_liked,
-					is_disliked: is_disliked,
-					user_object_id: user_object_id,
-					post_id: post_id
+				return res.status(200).json({
+					message: MESSAGE.post.succ,
+					result: "Like removed"
 				});
-				await newLike.save();
-				await ThreadModel.findByIdAndUpdate(post_id,{
-					$inc: { dislike_count: 1 }
-				})
 			}
-			return res.status(200).json({
-				message: MESSAGE.post.succ,
-				result: existingDisLike
-			});
+			if (
+				(existingLike.is_liked === is_liked && existingLike.is_disliked !== is_disliked) ||
+				(existingLike.is_liked !== is_liked && existingLike.is_disliked === is_disliked)
+			) {
+				await ThreadLikeModel.findOneAndUpdate(
+					{ user_object_id: user_object_id, post_id: post_id },
+					{
+						$set: {
+							is_liked: is_liked,
+							is_disliked: is_disliked
+						}
+					}
+				);
+				await ThreadModel.findByIdAndUpdate(post_id, {
+					$inc: { like_count: is_liked ? 1 : -1, dislike_count: is_disliked ? 1 : -1 }
+				});
+				res.status(200).json({
+					message: MESSAGE.post.succ,
+					result: "Like updated"
+				});
+			}
 		}
 		const newLike = new ThreadLikeModel({
 			is_liked: is_liked,
@@ -244,9 +231,9 @@ export const createLike = async (req: Request, res: Response) => {
 
 		const response = await newLike.save();
 
-		await ThreadModel.findByIdAndUpdate(post_id,{
+		await ThreadModel.findByIdAndUpdate(post_id, {
 			$inc: { like_count: is_liked ? 1 : -1, dislike_count: is_disliked ? 1 : -1 }
-		})
+		});
 
 		return res.status(200).json({
 			message: MESSAGE.post.succ,
@@ -259,4 +246,4 @@ export const createLike = async (req: Request, res: Response) => {
 			error: error
 		});
 	}
-}
+};
