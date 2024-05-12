@@ -201,9 +201,10 @@ export const createLike = async (req: Request, res: Response) => {
 				});
 			}
 			if (
-				(existingLike.is_liked === is_liked && existingLike.is_disliked !== is_disliked) ||
-				(existingLike.is_liked !== is_liked && existingLike.is_disliked === is_disliked)
+				(existingLike.is_liked && existingLike.is_disliked !== is_disliked) ||
+				(existingLike.is_disliked && existingLike.is_liked !== is_liked)
 			) {
+				console.log("---->existingLike", existingLike.is_disliked !== is_disliked);
 				await ThreadLikeModel.findOneAndUpdate(
 					{ user_object_id: user_object_id, post_id: post_id },
 					{
@@ -216,7 +217,7 @@ export const createLike = async (req: Request, res: Response) => {
 				await ThreadModel.findByIdAndUpdate(post_id, {
 					$inc: { like_count: is_liked ? 1 : -1, dislike_count: is_disliked ? 1 : -1 }
 				});
-				res.status(200).json({
+				return res.status(200).json({
 					message: MESSAGE.post.succ,
 					result: "Like updated"
 				});
