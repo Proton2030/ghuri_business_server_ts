@@ -6,6 +6,7 @@ import ThreadCommentModel from "../../../../models/thread.comment.model";
 import DataURIParser from "datauri/parser";
 import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
 import ThreadLikeModel from "../../../../models/threadLike.model";
+import mongoose from "mongoose";
 
 const parser = new DataURIParser();
 
@@ -70,19 +71,69 @@ export const getFilteredThread = async (req: Request, res: Response) => {
 		const startIndex = (currentPage - 1) * limit;
 
 		const sortField = filter.sortField ? filter.sortField : "updatedAt";
+		const user_object_id = filter.user_object_id ? filter.user_object_id : null;
 
 		delete filter.page;
 		delete filter.sortField;
+		delete filter.user_object_id;
 
 		console.log("===>filter", filter);
 
 		const totalCount = await ThreadModel.countDocuments(filter);
 
-		const threadList = await ThreadModel.find(filter)
-			.sort({ [sortField]: -1 })
-			.populate("user_details")
-			.skip(startIndex)
-			.limit(limit);
+		// const threadList = await ThreadModel.find(filter)
+		// 	.sort({ [sortField]: -1 })
+		// 	.populate("user_details")
+		// 	.skip(startIndex)
+		// 	.limit(limit);
+
+		const threadList = await ThreadModel.aggregate([
+			{ $match: filter },
+			{ $sort: { [sortField]: -1 } },
+			{ $skip: startIndex },
+			{ $limit: limit },
+			{ $lookup: { from: "users", localField: "user_object_id", foreignField: "_id", as: "user_details" } },
+			{ $unwind: "$user_details" },
+			{
+				$lookup: {
+					from: "thread_likes",
+					let: { postId: "$_id", userId: new mongoose.Types.ObjectId(user_object_id) },
+					pipeline: [
+						{
+							$match: {
+								$expr: {
+									$and: [{ $eq: ["$post_id", "$$postId"] }, { $eq: ["$user_object_id", "$$userId"] }]
+								}
+							}
+						}
+					],
+					as: "like_details"
+				}
+			},
+			{
+				$addFields: {
+					is_liked: {
+						$cond: {
+							if: { $gt: [{ $size: "$like_details" }, 0] },
+							then: { $arrayElemAt: ["$like_details.is_liked", 0] },
+							else: false
+						}
+					},
+					is_disliked: {
+						$cond: {
+							if: { $gt: [{ $size: "$like_details" }, 0] },
+							then: { $arrayElemAt: ["$like_details.is_disliked", 0] },
+							else: false
+						}
+					}
+				}
+			},
+			{
+				$project: {
+					like_details: 0
+				}
+			}
+		]);
 
 		res.status(200).json({
 			message: MESSAGE.get.succ,
