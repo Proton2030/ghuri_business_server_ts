@@ -5,6 +5,7 @@ import ThreadModel from "../../../../models/thread.model";
 import ThreadCommentModel from "../../../../models/thread.comment.model";
 import DataURIParser from "datauri/parser";
 import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
+import ThreadLikeModel from "../../../../models/threadLike.model";
 
 const parser = new DataURIParser();
 
@@ -178,3 +179,53 @@ export const getComment = async (req: Request, res: Response) => {
 		});
 	}
 };
+
+export const createLike = async (req: Request, res: Response) => {
+	try {
+		const { liked_status, user_object_id, post_id } = req.body;
+
+		const is_liked = liked_status === "LIKE" ? true : false;
+		const is_disliked = liked_status === "DISLIKE" ? true : false;
+
+		const existingLike = await ThreadLikeModel.findOne({ user_object_id: user_object_id, post_id: post_id });
+
+		if(existingLike){
+			await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id },{
+				$set: {
+					is_liked: !is_liked,
+					is_disliked: !is_disliked
+				}
+			})
+			await ThreadModel.findByIdAndUpdate(post_id,{
+				$inc: { like_count: is_liked ? -1 : 1, dislike_count: is_disliked ? -1 : 1 }
+			})
+			return res.status(200).json({
+				message: MESSAGE.post.succ,
+				result: existingLike
+			});
+		}
+		const newLike = new ThreadLikeModel({
+			is_liked: is_liked,
+			is_disliked: is_disliked,
+			user_object_id: user_object_id,
+			post_id: post_id
+		});
+
+		const response = await newLike.save();
+
+		await ThreadModel.findByIdAndUpdate(post_id,{
+			$inc: { like_count: is_liked ? 1 : -1, dislike_count: is_disliked ? 1 : -1 }
+		})
+
+		return res.status(200).json({
+			message: MESSAGE.post.succ,
+			result: response
+		});
+	} catch (error) {
+		console.error(error);
+		return res.status(400).json({
+			message: MESSAGE.post.fail,
+			error: error
+		});
+	}
+}

@@ -1,6 +1,7 @@
 import express from "express";
 import {
 	createComment,
+	createLike,
 	createThread,
 	getComment,
 	getFilteredThread,
@@ -17,5 +18,7 @@ router.post("/createThread", upload.fields([{ name: "images", maxCount: 1 }]), c
 router.route("/getThread").get(getFilteredThread);
 router.route("/likeCount").patch(likeCount);
 router.post("/createComment", createComment);
+router.post("/create-like", createLike);
 router.route("/getComment").get(getComment);
+
 module.exports = router;
