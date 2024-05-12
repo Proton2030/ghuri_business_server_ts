@@ -190,7 +190,7 @@ export const createLike = async (req: Request, res: Response) => {
 		const existingLike = await ThreadLikeModel.findOne({ user_object_id: user_object_id, post_id: post_id });
 
 		if(existingLike){
-			await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id },{
+			await ThreadLikeModel.findOneAndUpdate({ user_object_id: user_object_id, post_id: post_id },{
 				$set: {
 					is_liked: !is_liked,
 					is_disliked: !is_disliked
