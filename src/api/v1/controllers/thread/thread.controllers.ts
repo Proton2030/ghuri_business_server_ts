@@ -250,10 +250,10 @@ export const createLike = async (req: Request, res: Response) => {
 		if (existingLike) {
 			if (existingLike.is_liked === is_liked && existingLike.is_disliked === is_disliked) {
 				await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id });
-				await ThreadModel.findByIdAndUpdate(post_id, {
-					$inc: { like_count: is_liked ? -1 : 0, dislike_count: is_disliked ? -1 : 0 }
+				// await ThreadModel.findByIdAndUpdate(post_id, {
+				// 	$inc: { like_count: is_liked ? -1 : 0, dislike_count: is_disliked ? -1 : 0 }
 					
-				});
+				// });
 				return res.status(200).json({
 					message: MESSAGE.post.succ,
 					result: "Like removed"
@@ -273,9 +273,12 @@ export const createLike = async (req: Request, res: Response) => {
 						}
 					}
 				);
+				
+				const no_of_likes = await ThreadLikeModel.countDocuments({post_id: post_id, is_liked: true})
+				const no_of_dislikes = await ThreadLikeModel.countDocuments({post_id: post_id, is_disliked: true});
 				await ThreadModel.findByIdAndUpdate(post_id, {
-					$inc: { like_count: is_liked ? -1 : 0, dislike_count: is_disliked ? -1 : 0 }
-				});
+					$set: { like_count: no_of_likes, dislike_count: no_of_dislikes }
+				})
 				return res.status(200).json({
 					message: MESSAGE.post.succ,
 					result: "Like updated"
@@ -291,10 +294,14 @@ export const createLike = async (req: Request, res: Response) => {
 
 		const response = await newLike.save();
 
+		// await ThreadModel.findByIdAndUpdate(post_id, {
+		// 	$inc: { like_count: is_liked ? 1 : 0, dislike_count: is_disliked ? 1 : 0 }
+		// });
+		const no_of_likes = await ThreadLikeModel.countDocuments({post_id: post_id, is_liked: true})
+		const no_of_dislikes = await ThreadLikeModel.countDocuments({post_id: post_id, is_disliked: true});
 		await ThreadModel.findByIdAndUpdate(post_id, {
-			$inc: { like_count: is_liked ? 1 : 0, dislike_count: is_disliked ? 1 : 0 }
-		});
-
+			$set: { like_count: no_of_likes, dislike_count: no_of_dislikes }
+		})
 		return res.status(200).json({
 			message: MESSAGE.post.succ,
 			result: response
