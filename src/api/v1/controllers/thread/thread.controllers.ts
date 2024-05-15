@@ -63,7 +63,7 @@ export const createThread = async (req: Request, res: Response) => {
 
 export const getFilteredThread = async (req: Request, res: Response) => {
 	try {
-		const filter: any = req.query;
+		let filter: any = req.query;
 		const currentPage = parseInt(String(filter.page || "1")); // Parse page as integer
 
 		const limit = 5;
@@ -71,11 +71,18 @@ export const getFilteredThread = async (req: Request, res: Response) => {
 		const startIndex = (currentPage - 1) * limit;
 
 		const sortField = filter.sortField ? filter.sortField : "updatedAt";
-		const user_object_id = filter.user_id ? filter.user_id : null;
+		const user_id = filter.user_id ? filter.user_id : null;
 
 		delete filter.page;
 		delete filter.sortField;
 		delete filter.user_id;
+
+		if(filter.user_object_id){
+			filter= {
+				...filter,
+				user_object_id: new mongoose.Types.ObjectId(filter.user_object_id)
+			}
+		}
 
 		console.log("===>filter", filter);
 
@@ -97,7 +104,7 @@ export const getFilteredThread = async (req: Request, res: Response) => {
 			{
 				$lookup: {
 					from: "thread_likes",
-					let: { postId: "$_id", userId: new mongoose.Types.ObjectId(user_object_id) },
+					let: { postId: "$_id", userId: new mongoose.Types.ObjectId(user_id) },
 					pipeline: [
 						{
 							$match: {
