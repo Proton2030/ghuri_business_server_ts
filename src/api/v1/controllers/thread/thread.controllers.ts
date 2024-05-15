@@ -252,6 +252,7 @@ export const createLike = async (req: Request, res: Response) => {
 				await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id });
 				await ThreadModel.findByIdAndUpdate(post_id, {
 					$inc: { like_count: is_liked ? -1 : 0, dislike_count: is_disliked ? -1 : 0 }
+					
 				});
 				return res.status(200).json({
 					message: MESSAGE.post.succ,
@@ -273,7 +274,7 @@ export const createLike = async (req: Request, res: Response) => {
 					}
 				);
 				await ThreadModel.findByIdAndUpdate(post_id, {
-					$inc: { like_count: is_liked ? 1 : -1, dislike_count: is_disliked ? 1 : -1 }
+					$inc: { like_count: is_liked ? -1 : 0, dislike_count: is_disliked ? -1 : 0 }
 				});
 				return res.status(200).json({
 					message: MESSAGE.post.succ,
