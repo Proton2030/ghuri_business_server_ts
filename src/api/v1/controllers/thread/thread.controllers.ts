@@ -318,3 +318,23 @@ export const createLike = async (req: Request, res: Response) => {
 		});
 	}
 };
+
+export const updateThreadStatus = async (req: Request, res: Response) => {
+	try{
+		const { postId, status } = req.body;
+
+		const updatedPost = await ThreadModel.findByIdAndUpdate(postId, {
+			$set: { status: status }
+		});
+		return res.status(200).json({
+			message: MESSAGE.patch.succ,
+			result: updatedPost
+		})
+	} catch (error) {
+		console.error(error);
+		return res.status(400).json({
+			message: MESSAGE.post.fail,
+			error: error
+		});
+	}
+}

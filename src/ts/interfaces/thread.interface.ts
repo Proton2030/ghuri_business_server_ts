@@ -8,4 +8,5 @@ export interface IThreadSchema {
 	comments_count:number;
 	is_approved: boolean;
 	dislike_count: number;
+	status: string;
 }

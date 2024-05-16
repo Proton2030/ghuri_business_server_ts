@@ -5,7 +5,8 @@ import {
 	createThread,
 	getComment,
 	getFilteredThread,
-	likeCount
+	likeCount,
+	updateThreadStatus
 } from "../../controllers/thread/thread.controllers";
 import multer from "multer";
 
@@ -19,6 +20,7 @@ router.route("/getThread").get(getFilteredThread);
 router.route("/likeCount").patch(likeCount);
 router.post("/createComment", createComment);
 router.post("/create-like", createLike);
+router.post("/update-status", updateThreadStatus);
 router.route("/getComment").get(getComment);
 
 module.exports = router;
