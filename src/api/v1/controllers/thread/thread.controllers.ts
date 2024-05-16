@@ -14,36 +14,40 @@ export const createThread = async (req: Request, res: Response) => {
 	try {
 		const { message_body, user_object_id } = req.body;
 
-		if (!req.files || !("images" in req.files)) {
-			console.log("files", JSON.stringify(req.files));
-			return res.status(404).json({
-				message: MESSAGE.post.custom("Image files not found")
-			});
-		}
+		// if (!req.files || !("images" in req.files)) {
+		// 	console.log("files", JSON.stringify(req.files));
+		// 	return res.status(404).json({
+		// 		message: MESSAGE.post.custom("Image files not found")
+		// 	});
+		// }
 
 		// Ensure that req.files["images"] is of type Express.Multer.File[]
-		if (!Array.isArray(req.files["images"])) {
-			return res.status(400).json({
-				message: MESSAGE.post.custom("Invalid image files")
-			});
+		// if (!Array.isArray(req.files["images"])) {
+		// 	return res.status(400).json({
+		// 		message: MESSAGE.post.custom("Invalid image files")
+		// 	});
+		// }
+
+		let images: string[] = [];
+
+		if (req.files && ("images" in req.files) && Array.isArray(req.files["images"])) {
+			images = await Promise.all(
+				(req.files["images"] as Express.Multer.File[]).map(async (file: Express.Multer.File) => {
+					// Convert the uploaded file to Data URI
+					const dataUri: any = parser.format(file.originalname, file.buffer);
+
+					// Upload the image to Cloudinary
+					const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
+
+					return cloudinaryUrl;
+				})
+			);
 		}
-
-		const images = await Promise.all(
-			(req.files["images"] as Express.Multer.File[]).map(async (file: Express.Multer.File) => {
-				// Convert the uploaded file to Data URI
-				const dataUri: any = parser.format(file.originalname, file.buffer);
-
-				// Upload the image to Cloudinary
-				const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
-
-				return cloudinaryUrl;
-			})
-		);
 
 		const newThread = new ThreadModel({
 			message_body: message_body,
 			user_object_id: user_object_id,
-			message_media_url: images[0]
+			message_media_url: images.length > 0 ? images[0] : null
 		});
 
 		const response = await newThread.save();
@@ -77,11 +81,11 @@ export const getFilteredThread = async (req: Request, res: Response) => {
 		delete filter.sortField;
 		delete filter.user_id;
 
-		if(filter.user_object_id){
-			filter= {
+		if (filter.user_object_id) {
+			filter = {
 				...filter,
 				user_object_id: new mongoose.Types.ObjectId(filter.user_object_id)
-			}
+			};
 		}
 
 		console.log("===>filter", filter);
@@ -252,7 +256,7 @@ export const createLike = async (req: Request, res: Response) => {
 				await ThreadLikeModel.findOneAndDelete({ user_object_id: user_object_id, post_id: post_id });
 				// await ThreadModel.findByIdAndUpdate(post_id, {
 				// 	$inc: { like_count: is_liked ? -1 : 0, dislike_count: is_disliked ? -1 : 0 }
-					
+
 				// });
 				return res.status(200).json({
 					message: MESSAGE.post.succ,
@@ -273,12 +277,12 @@ export const createLike = async (req: Request, res: Response) => {
 						}
 					}
 				);
-				
-				const no_of_likes = await ThreadLikeModel.countDocuments({post_id: post_id, is_liked: true})
-				const no_of_dislikes = await ThreadLikeModel.countDocuments({post_id: post_id, is_disliked: true});
+
+				const no_of_likes = await ThreadLikeModel.countDocuments({ post_id: post_id, is_liked: true });
+				const no_of_dislikes = await ThreadLikeModel.countDocuments({ post_id: post_id, is_disliked: true });
 				await ThreadModel.findByIdAndUpdate(post_id, {
 					$set: { like_count: no_of_likes, dislike_count: no_of_dislikes }
-				})
+				});
 				return res.status(200).json({
 					message: MESSAGE.post.succ,
 					result: "Like updated"
@@ -297,11 +301,11 @@ export const createLike = async (req: Request, res: Response) => {
 		// await ThreadModel.findByIdAndUpdate(post_id, {
 		// 	$inc: { like_count: is_liked ? 1 : 0, dislike_count: is_disliked ? 1 : 0 }
 		// });
-		const no_of_likes = await ThreadLikeModel.countDocuments({post_id: post_id, is_liked: true})
-		const no_of_dislikes = await ThreadLikeModel.countDocuments({post_id: post_id, is_disliked: true});
+		const no_of_likes = await ThreadLikeModel.countDocuments({ post_id: post_id, is_liked: true });
+		const no_of_dislikes = await ThreadLikeModel.countDocuments({ post_id: post_id, is_disliked: true });
 		await ThreadModel.findByIdAndUpdate(post_id, {
 			$set: { like_count: no_of_likes, dislike_count: no_of_dislikes }
-		})
+		});
 		return res.status(200).json({
 			message: MESSAGE.post.succ,
 			result: response
