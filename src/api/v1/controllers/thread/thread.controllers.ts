@@ -7,6 +7,7 @@ import DataURIParser from "datauri/parser";
 import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
 import ThreadLikeModel from "../../../../models/threadLike.model";
 import mongoose from "mongoose";
+import { createNotification } from "../../../../services/notification/notification.service";
 
 const parser = new DataURIParser();
 
@@ -326,6 +327,16 @@ export const updateThreadStatus = async (req: Request, res: Response) => {
 		const updatedPost = await ThreadModel.findByIdAndUpdate(postId, {
 			$set: { status: status }
 		});
+		const post = await ThreadModel.findById(postId);
+		if (post) {
+			if (status === "ACTIVE") {
+				console.log("====>Active")
+				await createNotification(String(post.user_object_id), "Your Chat Post is approved by Admin");
+			} else if (status === "REJECTED") {
+				console.log("====>reject")
+				await createNotification(String(post.user_object_id), "Your Chat Post is rejected by Admin");
+			}
+		}
 		return res.status(200).json({
 			message: MESSAGE.patch.succ,
 			result: updatedPost
