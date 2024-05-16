@@ -357,7 +357,7 @@ export const deleteThread = async (req: Request, res: Response) => {
 		return res.status(200).json({
 			message: MESSAGE.delete.succ,
 			result: response
-		});
+		}); 
 	} catch (error) {
 		console.error(error);
 		return res.status(400).json({
