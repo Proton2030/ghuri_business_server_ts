@@ -3,6 +3,7 @@ import {
 	createComment,
 	createLike,
 	createThread,
+	deleteThread,
 	getComment,
 	getFilteredThread,
 	likeCount,
@@ -21,6 +22,7 @@ router.route("/likeCount").patch(likeCount);
 router.post("/createComment", createComment);
 router.post("/create-like", createLike);
 router.patch("/update-status", updateThreadStatus);
+router.patch("/delete-thread", deleteThread);
 router.route("/getComment").get(getComment);
 
 module.exports = router;
