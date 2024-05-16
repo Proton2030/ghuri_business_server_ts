@@ -20,7 +20,7 @@ router.route("/getThread").get(getFilteredThread);
 router.route("/likeCount").patch(likeCount);
 router.post("/createComment", createComment);
 router.post("/create-like", createLike);
-router.post("/update-status", updateThreadStatus);
+router.patch("/update-status", updateThreadStatus);
 router.route("/getComment").get(getComment);
 
 module.exports = router;
