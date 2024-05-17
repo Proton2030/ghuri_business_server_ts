@@ -352,7 +352,7 @@ export const updateThreadStatus = async (req: Request, res: Response) => {
 
 export const deleteThread = async (req: Request, res: Response) => {
 	try {
-		const { postId } = req.body;
+		const { postId } = req.params;
 		const response = await ThreadModel.findByIdAndDelete(postId);
 		return res.status(200).json({
 			message: MESSAGE.delete.succ,

@@ -22,7 +22,7 @@ router.route("/likeCount").patch(likeCount);
 router.post("/createComment", createComment);
 router.post("/create-like", createLike);
 router.patch("/update-status", updateThreadStatus);
-router.delete("/delete-thread", deleteThread);
+router.delete("/delete-thread/:postId", deleteThread);
 router.route("/getComment").get(getComment);
 
 module.exports = router;
