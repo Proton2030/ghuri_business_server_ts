@@ -8,7 +8,7 @@ const parser = new DatauriParser();
 
 export const createCategory = async (req: Request, res: Response) => {
 	try {
-		const { category, is_active } = req.body;
+		const { category, is_active, sequence } = req.body;
 		if (!req.files || !("images" in req.files)) {
 			console.log("files", JSON.stringify(req.files));
 			return res.status(404).json({
@@ -38,6 +38,7 @@ export const createCategory = async (req: Request, res: Response) => {
 		const newCategory = new CategoryModel({
 			category,
 			is_active,
+			sequence : Number(sequence),
 			photo: images
 		});
 
@@ -58,7 +59,7 @@ export const createCategory = async (req: Request, res: Response) => {
 export const editCategory = async (req: Request, res: Response) => {
 	try {
 		const _id = req.params;
-		const { category, is_active } = req.body;
+		const { category, is_active, sequence } = req.body;
 		let images: any = null;
 		if (req.files && "images" in req.files) {
 			images = (req.files["images"] as Express.Multer.File[]).map((file: Express.Multer.File) => {
@@ -69,7 +70,8 @@ export const editCategory = async (req: Request, res: Response) => {
 
 		let payload: any = {
 			category,
-			is_active
+			is_active,
+			sequence : Number(sequence)
 		};
 
 		if (images) {
@@ -100,7 +102,7 @@ export const getCategories = async (req: Request, res: Response) => {
 	try {
 		const { ...filter } = req.query;
 
-		const categories = await CategoryModel.find(filter);
+		const categories = await CategoryModel.find(filter).sort({ sequence: 1 });
 		res.status(200).json({
 			message: MESSAGE.get.succ,
 			result: categories
