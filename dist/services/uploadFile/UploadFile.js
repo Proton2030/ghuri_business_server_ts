@@ -27,8 +27,9 @@ const SpaceUpload = (imagePath) => __awaiter(void 0, void 0, void 0, function* (
     // Set the upload parameters
     const params = {
         Bucket: "gurigharangna", // Your Space name
-        Key: fileName, // The name of the file to be saved in the Space
-        Body: require("fs").createReadStream(imagePath), // Read the image file as a stream
+        Key: fileName, // The name of the file to be saved in the bucket
+        Body: Buffer.from(imagePath.replace(/^data:image\/\w+;base64,/, ""), "base64"), // Remove the data URI scheme and decode the base64 string
+        ContentEncoding: "base64", // Specify that the content is base64 encoded
         ACL: "public-read", // Make the file publicly accessible
         ContentType: "image/jpeg", // Adjust MIME type according to the image type (optional)
     };
