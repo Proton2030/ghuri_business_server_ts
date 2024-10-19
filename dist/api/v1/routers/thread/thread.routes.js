@@ -5,7 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const thread_controllers_1 = require("../../controllers/thread/thread.controllers");
+const multer_1 = __importDefault(require("multer"));
 const router = express_1.default.Router();
-router.post("/createThread", thread_controllers_1.createThread);
-router.route("/getThread").get(thread_controllers_1.getThread);
+const storage = multer_1.default.memoryStorage();
+const upload = (0, multer_1.default)({ storage: storage });
+router.post("/createThread", upload.fields([{ name: "images", maxCount: 1 }]), thread_controllers_1.createThread);
+router.route("/getThread").get(thread_controllers_1.getFilteredThread);
+router.route("/likeCount").patch(thread_controllers_1.likeCount);
+router.post("/createComment", thread_controllers_1.createComment);
+router.post("/create-like", thread_controllers_1.createLike);
+router.patch("/update-status", thread_controllers_1.updateThreadStatus);
+router.delete("/delete-thread/:postId", thread_controllers_1.deleteThread);
+router.route("/getComment").get(thread_controllers_1.getComment);
 module.exports = router;

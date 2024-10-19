@@ -31,7 +31,7 @@ const UploadFile_1 = require("../../../../services/uploadFile/UploadFile");
 const parser = new parser_1.default();
 const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { category, is_active } = req.body;
+        const { category, is_active, sequence } = req.body;
         if (!req.files || !("images" in req.files)) {
             console.log("files", JSON.stringify(req.files));
             return res.status(404).json({
@@ -48,12 +48,13 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
             // Convert the uploaded file to Data URI
             const dataUri = parser.format(file.originalname, file.buffer);
             // Upload the image to Cloudinary
-            const cloudinaryUrl = yield (0, UploadFile_1.CloudinaryUpload)(dataUri.content);
+            const cloudinaryUrl = yield (0, UploadFile_1.SpaceUpload)(dataUri.content);
             return cloudinaryUrl;
         })));
         const newCategory = new category_model_1.default({
             category,
             is_active,
+            sequence: Number(sequence),
             photo: images
         });
         const savedCategory = yield newCategory.save();
@@ -73,7 +74,7 @@ exports.createCategory = createCategory;
 const editCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const _id = req.params;
-        const { category, is_active } = req.body;
+        const { category, is_active, sequence } = req.body;
         let images = null;
         if (req.files && "images" in req.files) {
             images = req.files["images"].map((file) => {
@@ -83,7 +84,8 @@ const editCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
         let payload = {
             category,
-            is_active
+            is_active,
+            sequence: Number(sequence)
         };
         if (images) {
             payload = Object.assign(Object.assign({}, payload), { photo: images });
@@ -110,7 +112,7 @@ exports.editCategory = editCategory;
 const getCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const filter = __rest(req.query, []);
-        const categories = yield category_model_1.default.find(filter);
+        const categories = yield category_model_1.default.find(filter).sort({ sequence: 1 });
         res.status(200).json({
             message: message_1.MESSAGE.get.succ,
             result: categories

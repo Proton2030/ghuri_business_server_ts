@@ -41,7 +41,7 @@ const createBusiness = (req, res) => __awaiter(void 0, void 0, void 0, function*
             // Convert the uploaded file to Data URI
             const dataUri = parser.format(file.originalname, file.buffer);
             // Upload the image to Cloudinary
-            const cloudinaryUrl = yield (0, UploadFile_1.CloudinaryUpload)(dataUri.content);
+            const cloudinaryUrl = yield (0, UploadFile_1.SpaceUpload)(dataUri.content);
             return cloudinaryUrl;
         })));
         const latLong = has_acurate_lat_long ? { latitude, longitude } : yield (0, getLatLonByCityName_1.default)(address);

@@ -37,7 +37,7 @@ const createAdvertisement = (req, res) => __awaiter(void 0, void 0, void 0, func
             // Convert the uploaded file to Data URI
             const dataUri = parser.format(file.originalname, file.buffer);
             // Upload the image to Cloudinary
-            const cloudinaryUrl = yield (0, UploadFile_1.CloudinaryUpload)(dataUri.content);
+            const cloudinaryUrl = yield (0, UploadFile_1.SpaceUpload)(dataUri.content);
             return cloudinaryUrl;
         })));
         const newAdvertisement = new add_model_1.default({

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import AddModel from "../../../../models/add.model";
 import { MESSAGE } from "../../../../constants/message";
 import DatauriParser from "datauri/parser";
-import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
+import {SpaceUpload} from "../../../../services/uploadFile/UploadFile";
 
 const parser = new DatauriParser();
 
@@ -29,7 +29,7 @@ export const createAdvertisement = async (req: Request, res: Response) => {
 				const dataUri: any = parser.format(file.originalname, file.buffer);
 
 				// Upload the image to Cloudinary
-				const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
+				const cloudinaryUrl = await SpaceUpload(dataUri.content);
 
 				return cloudinaryUrl;
 			})

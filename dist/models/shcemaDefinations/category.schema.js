@@ -8,6 +8,7 @@ const model_constant_1 = __importDefault(require("../../constants/model/model.co
 const CategorySchema = new mongoose_1.Schema({
     category: model_constant_1.default.requiredString,
     is_active: model_constant_1.default.optionalBoolean,
-    photo: model_constant_1.default.optionalNullObject
+    photo: model_constant_1.default.optionalNullObject,
+    sequence: model_constant_1.default.optionalNullNumber,
 });
 exports.default = CategorySchema;

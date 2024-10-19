@@ -11,7 +11,7 @@ import RatingModel from "../../../../models/rating.model";
 import { TrustProductsChannelEndpointAssignmentListInstance } from "twilio/lib/rest/trusthub/v1/trustProducts/trustProductsChannelEndpointAssignment";
 import { FilterQuery } from "mongoose";
 import { IBussiness } from "../../../../ts/interfaces/bussiness.interface";
-import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
+import { SpaceUpload } from "../../../../services/uploadFile/UploadFile";
 
 const parser = new DatauriParser();
 
@@ -51,7 +51,7 @@ export const createBusiness = async (req: Request, res: Response) => {
 				const dataUri: any = parser.format(file.originalname, file.buffer);
 
 				// Upload the image to Cloudinary
-				const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
+				const cloudinaryUrl = await SpaceUpload(dataUri.content);
 
 				return cloudinaryUrl;
 			})

@@ -4,7 +4,7 @@ import { MESSAGE } from "../../../../constants/message";
 import ThreadModel from "../../../../models/thread.model";
 import ThreadCommentModel from "../../../../models/thread.comment.model";
 import DataURIParser from "datauri/parser";
-import { CloudinaryUpload } from "../../../../services/uploadFile/UploadFile";
+import { SpaceUpload } from "../../../../services/uploadFile/UploadFile";
 import ThreadLikeModel from "../../../../models/threadLike.model";
 import mongoose from "mongoose";
 import { createNotification } from "../../../../services/notification/notification.service";
@@ -38,7 +38,7 @@ export const createThread = async (req: Request, res: Response) => {
 					const dataUri: any = parser.format(file.originalname, file.buffer);
 
 					// Upload the image to Cloudinary
-					const cloudinaryUrl = await CloudinaryUpload(dataUri.content);
+					const cloudinaryUrl = await SpaceUpload(dataUri.content);
 
 					return cloudinaryUrl;
 				})
