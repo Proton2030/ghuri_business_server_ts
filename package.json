@@ -23,6 +23,9 @@
     "start": "tsc --project tsconfig.json && node dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.675.0",
+    "@aws-sdk/lib-storage": "^3.675.0",
+    "@aws-sdk/s3-request-presigner": "^3.675.0",
     "@types/bcryptjs": "^2.4.3",
     "@types/crypto-js": "^4.2.1",
     "@types/dotenv": "^8.2.0",

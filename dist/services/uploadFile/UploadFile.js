@@ -8,17 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpaceUpload = void 0;
-const aws_sdk_1 = __importDefault(require("aws-sdk"));
-// Configure DigitalOcean Spaces (using AWS SDK)
-const s3 = new aws_sdk_1.default.S3({
-    endpoint: new aws_sdk_1.default.Endpoint("https://gurigharangna.blr1.digitaloceanspaces.com"), // DigitalOcean Spaces endpoint (region-specific)
-    accessKeyId: process.env.REACT_APP_DO_SPACES_KEY || "DO00W839CX4RVUNUKLZD", // Your Access Key from .env
-    secretAccessKey: process.env.REACT_APP_DO_SPACES_SECRET || "mDjp2E9cZP99oN5mlo4mHAcBRjrg2RHX/X7cB/42oHM", // Your Secret Key from .env
+const client_s3_1 = require("@aws-sdk/client-s3");
+// Configure DigitalOcean Spaces (using AWS SDK v3)
+const s3Client = new client_s3_1.S3Client({
+    endpoint: "https://blr1.digitaloceanspaces.com", // Use region-specific endpoint without the bucket name
+    region: "us-east-1", // DigitalOcean uses 'us-east-1' by default
+    credentials: {
+        accessKeyId: process.env.REACT_APP_DO_SPACES_KEY || "DO00W839CX4RVUNUKLZD",
+        secretAccessKey: process.env.REACT_APP_DO_SPACES_SECRET || "mDjp2E9cZP99oN5mlo4mHAcBRjrg2RHX/X7cB/42oHM",
+    },
 });
 // Function to upload image to DigitalOcean Spaces
 const SpaceUpload = (imagePath) => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,9 +35,11 @@ const SpaceUpload = (imagePath) => __awaiter(void 0, void 0, void 0, function* (
     };
     try {
         // Upload the file to DigitalOcean Spaces
-        const result = yield s3.upload(params).promise();
-        console.log("------>result", result.Location);
-        return result.Location; // The URL of the uploaded image
+        const command = new client_s3_1.PutObjectCommand(params);
+        const result = yield s3Client.send(command);
+        console.log("------>result", result); // result should contain status and info, but no "Location"
+        const fileUrl = `https://gurigharangna.blr1.digitaloceanspaces.com/${fileName}`;
+        return fileUrl; // The URL of the uploaded image
     }
     catch (error) {
         console.error("Error uploading image:", error);

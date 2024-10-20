@@ -66,6 +66,8 @@ export const createThread = async (req: Request, res: Response) => {
 	}
 };
 
+  
+
 export const getFilteredThread = async (req: Request, res: Response) => {
 	try {
 		let filter: any = req.query;
