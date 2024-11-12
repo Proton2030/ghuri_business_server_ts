@@ -12,6 +12,7 @@ import { TrustProductsChannelEndpointAssignmentListInstance } from "twilio/lib/r
 import { FilterQuery } from "mongoose";
 import { IBussiness } from "../../../../ts/interfaces/bussiness.interface";
 import { SpaceUpload } from "../../../../services/uploadFile/UploadFile";
+import { error } from "console";
 
 const parser = new DatauriParser();
 
@@ -97,38 +98,74 @@ export const createBusiness = async (req: Request, res: Response) => {
 export const editBusinessDetailsById = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params;
-		const { user_object_id, name, phone_no, description, location, email, category, pin_code, lat } = req.body;
+		const {
+			user_object_id,
+			name,
+			phone_no,
+			description,
+			address,
+			email,
+			category,
+			pin_code,
+			status,
+		} = req.body;
 
+		// Check if new images are provided
+		let images = req.body.photo || [];
+		if (req.files && "images" in req.files) {
+			if (Array.isArray(req.files["images"])) {
+				images = await Promise.all(
+					(req.files["images"] as Express.Multer.File[]).map(async (file: Express.Multer.File) => {
+						const dataUri: any = parser.format(file.originalname, file.buffer);
+						return await SpaceUpload(dataUri.content);
+					})
+				);
+			} else {
+				return res.status(400).json({
+					message: MESSAGE.post.custom("Invalid image files"),
+				});
+			}
+		}
+
+		// Define fields to update
 		const updatedFields = {
 			user_object_id,
 			name,
 			phone_no,
 			description,
-			location,
+			address,
 			email,
-			category,
-			pin_code
+			category: category?.toLowerCase(),
+			pin_code,
+			
+			photo: images,
+			status,
 		};
 
+		// Update the business record
 		const updatedBusiness = await BussinessModel.findByIdAndUpdate(id, updatedFields, { new: true });
 
 		if (!updatedBusiness) {
 			return res.status(404).json({
-				message: MESSAGE.post.custom("Business not found")
+				message: MESSAGE.patch.fail,
+				error: "Business not found",
 			});
 		}
 
 		res.status(200).json({
-			message: MESSAGE.post.succ,
-			result: updatedBusiness
+			message: MESSAGE.patch.succ,
+			result: updatedBusiness,
 		});
 	} catch (error) {
 		console.error("Error editing business:", error);
 		res.status(400).json({
-			message: MESSAGE.post.fail
+			message: MESSAGE.patch.fail,
+			error:error,
 		});
 	}
 };
+
+
 
 export const getBusiness = async (req: Request, res: Response) => {
 	try {

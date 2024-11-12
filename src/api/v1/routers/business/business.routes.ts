@@ -32,7 +32,7 @@ router.post("/postBusiness", upload.fields([{ name: "images", maxCount: 10 }]), 
 
 router.patch("/editBusiness", editBusinessStatusById);
 
-router.patch("/editBusinessDetailsById/:id", editBusinessDetailsById);
+router.patch("/editBusinessDetailsById/:id",upload.fields([{ name: "images", maxCount: 10 }]), editBusinessDetailsById);
 
 router.delete("/deleteBusiness", deleteBusinessById);
 
