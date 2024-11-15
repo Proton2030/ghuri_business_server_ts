@@ -122,7 +122,7 @@ export const editBusinessDetailsById = async (req: Request, res: Response) => {
 				);
 			} else {
 				return res.status(400).json({
-					message: MESSAGE.post.custom("Invalid image files"),
+					message: MESSAGE.patch.custom("Invalid image files"),
 				});
 			}
 		}
